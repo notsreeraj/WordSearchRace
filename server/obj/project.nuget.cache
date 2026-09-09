@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "CXHtHkqFhtk=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\sreer\\Demo\\WordSearchRace\\server\\server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\sreer\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.19\\microsoft.aspnetcore.openapi.9.0.19.nupkg.sha512",
+    "C:\\Users\\sreer\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
