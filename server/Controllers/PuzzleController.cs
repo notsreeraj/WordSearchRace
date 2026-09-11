@@ -5,28 +5,45 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using server.Interfaces;
 
 namespace server.Controllers
 {
+    /// <summary>
+    /// Controller to manage any request regarding puzzle
+    /// </summary>
+    /// <param name="puzzleService"></param>
     [Route("[controller]")]
-    public class PuzzleController : Controller
+    public class PuzzleController(IPuzzleService puzzleService) : Controller
     {
-        private readonly ILogger<PuzzleController> _logger;
 
-        public PuzzleController(ILogger<PuzzleController> logger)
+        // list of endpoints for this controller
+        /*
+        
+        
+        */
+
+
+
+
+
+
+        // call  the generate puzzle method from puzzle service
+        [HttpGet]
+        public ActionResult<string[]> GetPuzzle()
         {
-            _logger = logger;
+            var grid =  puzzleService.GeneratePuzzle(20);
+            ;
+
+             var rows = Enumerable.Range(0, grid.GetLength(0))
+            .Select(row => new string(Enumerable.Range(0, grid.GetLength(1))
+                .Select(col => grid[row, col] == '\0' ? '*' : grid[row, col])
+                .ToArray()))
+            .ToArray();
+
+        return Ok(rows);
+
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View("Error!");
-        }
     }
 }
