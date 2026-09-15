@@ -14,7 +14,7 @@ namespace server.Services
 
         #region Memory
 
-        static Dictionary<string , Game> _games = new Dictionary<string, Game>();
+        static Dictionary<string , Game>? _games = new Dictionary<string, Game>();
         
         #endregion
 
@@ -24,13 +24,13 @@ namespace server.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Game CreateNewGame(string playerID)
+        public async Task<Game> CreateNewGameAsync(string playerID)
         {
-            var newGame = new Game(playerID);
+             var newGame = new Game(playerID);
 
-            _games.Add( newGame.Id,newGame);
+             _games.Add( newGame.Id,newGame);
 
-            return newGame;
+            return   newGame;
         }
 
         /// <summary>
@@ -42,20 +42,17 @@ namespace server.Services
         /// <param name="listChoice"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Game InitiateGame(string gameId, int size, int listChoice)
+        public async Task<Game> InitiateGameAsync(string gameId, int size)
         {
             var currentGame  = FindGameID(gameId);
-            if(currentGame == null) throw new Exception("Game not found"); 
+            if(currentGame == null) throw new ArgumentException("Game not found"); 
 
 
             // get the puzzlle with size and listChoice
-            var newPuzzle = _puzzleService.GeneratePuzzle(size , listChoice);
+            var newPuzzle = _puzzleService.GeneratePuzzle(size);
 
             return currentGame;
         }
-
-
-
 
         /// <summary>
         /// finds a game with id
@@ -72,5 +69,12 @@ namespace server.Services
             else return null;
              
         }
-    }
-}
+
+
+
+
+
+
+    }//end class
+
+}//end namespace

@@ -8,14 +8,17 @@ namespace server.Models
 {
 
     /// <summary>
-    /// this class represents a game
+    ///  this class represents a game
     /// </summary>
-    /// <param name="playerId"> needs atleast one playr to initiate a game</param>
+    /// <param name="playerId">Needs atleast one player to start a game</param>
     public class Game(string playerId)
     {
         public string Id { get; set; }   = new Guid().ToString();
-        public List<string> Players { get; set; }
-        public Puzzle GamePuzzle { get; set; }
-        
+        public List<string> Players { get; set; } = new List<string>
+        {
+            playerId
+        };
+        public Puzzle? GamePuzzle { get; set; }
+
     }
 }

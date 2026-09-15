@@ -11,14 +11,9 @@ using server.Models;
 namespace server.Controllers
 {
     [Route("[controller]")]
-    public class GameController(IGameService _gameService, IPuzzleService _puzzleService) : Controller
+    public class GameController(IGameService _gameService) : Controller
     {
-        private readonly ILogger<GameController> _logger;
 
-        // public GameController(ILogger<GameController> logger)
-        // {
-        //     _logger = logger;
-        // }
 
         public IActionResult Index()
         {
@@ -40,10 +35,18 @@ namespace server.Controllers
         public async Task<ActionResult<Game>> CreateMatchRoom(string playerId)
         {
             // call game service to instantiate a game instance
-           var newGame =   _gameService.CreateNewGame(playerId);
+           var newGame =  await _gameService.CreateNewGameAsync(playerId);
 
 
-            return newGame;
+          return  newGame;
+
+        }
+
+        [HttpGet("InitiateGame")]
+        public async Task<ActionResult<Game>> InitiateGame(string gameId , int size)
+        {                      
+        var game = await _gameService.InitiateGameAsync(gameId,size);
+        return game;
 
         }
 

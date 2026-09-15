@@ -8,12 +8,12 @@ namespace server.Interfaces
 {
     public interface IGameService
     {
-        static Dictionary<string , Game> _games ;
+        static Dictionary<string , Game>? _games ;
 
-        Game CreateNewGame(string playerID);
+         Task<Game> CreateNewGameAsync(string playerID);
 
 
-        Game InitiateGame(int gameId, int size , int listChoice);
+         Task<Game> InitiateGameAsync(string gameId, int size );
 
     }
 }

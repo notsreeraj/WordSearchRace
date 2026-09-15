@@ -1,4 +1,5 @@
 using server.Interfaces;
+using server.Middleware;
 using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+// cors setup
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Client", policy =>
@@ -21,6 +23,7 @@ builder.Services.AddCors(options =>
 // addscoped will make sure that there puzzleservice instance for each request
 builder.Services.AddScoped<IPuzzleService,PuzzleService>();
 builder.Services.AddSingleton<IGameService, GameService>();
+builder.Services.AddSingleton<IWordService , WordService>();
 
 
 var app = builder.Build();
@@ -31,6 +34,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("Client");
 
 app.UseHttpsRedirection();

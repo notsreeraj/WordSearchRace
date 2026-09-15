@@ -6,12 +6,9 @@ using server.Interfaces;
 
 namespace server.Services
 {
-    public class PuzzleService : IPuzzleService
+    public class PuzzleService(IWordService _wordService) : IPuzzleService
     {
         
-
-        static readonly Random GlobalRandom = new Random();
-
         // here i am using struct based on the recomendation by MS, 
         // use struct for small , self-contained values .
         //Match represents the score , cell and the direction 
@@ -92,18 +89,39 @@ namespace server.Services
                    // 21 chars — impossible, should fail to place
             };
 
-        public  char[,] GeneratePuzzle(int size , int listChoice )
+    /// <summary>
+    ///  the main method to generate a puzzle based on  size and list of choice
+    /// </summary>
+    /// <param name="size"></param>
+    /// <param name="listChoice"></param>
+    /// <returns></returns>
+        public  char[,] GeneratePuzzle(int size )
         {
+    
 
-            ////now test the methods inside a loop
-            char[,] grid = new char[size,size];
+        //get the list of words from word service
+        var words = _wordService.GetWords(size);
+        var sorterdWords= words.OrderByDescending(w => w.Length).ToList();
+        ////now test the methods inside a loop
+        char[,] grid = new char[size,size];
 
-            foreach (string word in Words20x20)
-            {
-                AddWord(word, grid);
-                PrintGrid(grid);
-            }
-            return grid;
+        List<string> placedWords = new List<string>();
+        List<string> failedWords = new List<string>();
+
+        foreach (string word in sorterdWords)
+        {
+        bool placed = AddWord(word, grid); // assuming you switched this to return bool, as discussed earlier
+        if (placed)
+            placedWords.Add(word);
+        else
+            failedWords.Add(word);
+        }
+
+        if (placedWords.Count == 0)
+        {
+            throw new InvalidOperationException("No words could be placed on the grid.");
+        }
+        return grid;
 
 
             
@@ -117,7 +135,7 @@ namespace server.Services
         /// </summary>
         /// <param name="word"></param>
         /// <param name="Grid"></param>
-        static void AddWord(string word , char[,] Grid)
+        static bool AddWord(string word , char[,] Grid)
         {
             // iterate through grid 
             // check 2 conditions  =>  1:  is current cell empty , 2: does current cell contain same letter as the first letter of the word
@@ -142,6 +160,7 @@ namespace server.Services
                     {
 
                         Match? match = Measure(word, currentGrid, row, col);
+                        // this is to handle the null value return by measure
                         if (match.HasValue)
                         {
                             Matches.Add(match.Value);
@@ -157,13 +176,13 @@ namespace server.Services
             if (Matches.Count == 0)
             {
                 Console.WriteLine($"No valid placement found for {word}");
-                return;
+                return false;
             }
 
-            Match bestMatch = GetBestMatch(Matches , GlobalRandom);
+            Match bestMatch = GetBestMatch(Matches);
 
            
-            AssignLetter(word, bestMatch, Grid);
+            return AssignLetter(word, bestMatch, Grid);
 
 
 
@@ -184,15 +203,15 @@ namespace server.Services
         {
             int[,] directions =
             {
-        { 0, 1 },    // East
-        { -1, 1 },   // Northeast
-        { -1, 0 },   // North
-        { -1, -1 },  // Northwest
-        { 0, -1 },   // West
-        { 1, -1 },   // Southwest
-        { 1, 0 },    // South
-        { 1, 1 }     // Southeast
-    };
+                { 0, 1 },    // East
+                { -1, 1 },   // Northeast
+                { -1, 0 },   // North
+                { -1, -1 },  // Northwest
+                { 0, -1 },   // West
+                { 1, -1 },   // Southwest
+                { 1, 0 },    // South
+                { 1, 1 }     // Southeast
+            };
 
             int curScore = 0;
             List<Match> matches = new List<Match>();
@@ -222,30 +241,26 @@ namespace server.Services
                 }
 
                 else continue;
-                //else throw new Exception($"""
-                     
-                //    Newscore is not >= than curScore  
-                //    New Score = {newScore}
-                //    Row = {row}
-                //    Col = {col}
-                //    dirRow = {dRow}
-                //    dirCol = {dCol}
-                    
-                //    """);
 
 
             }
-
-  
-            List<Match> bestMatches = matches.Where(m => m.Score == curScore).ToList();
-            // PrintMatches(bestMatches);
-  
-            if (bestMatches.Count == 0)
+            
+            if(matches.Count== 0)
             {
                 return null;
             }
 
-            return GetBestMatch(bestMatches, GlobalRandom);
+
+  
+            List<Match> bestMatchesAllDir = matches.Where(m => m.Score == curScore).ToList();
+            // PrintMatches(bestMatches);
+  
+            if (bestMatchesAllDir.Count == 0)
+            {
+                return null;
+            }
+
+            return GetBestMatch(bestMatchesAllDir);
 
             
         }
@@ -311,8 +326,9 @@ namespace server.Services
         /// </summary>
         /// <param name="matches"></param>
         /// <returns></returns>
-        static Match GetBestMatch(List<Match> matches , Random globalRandom)
+        static Match GetBestMatch(List<Match> matches)
         {                        
+
              if (matches.Count == 1)
             {
 
@@ -323,7 +339,7 @@ namespace server.Services
                 throw new Exception("there is no match in the list");
             }
 
-            var randomMatch = matches[globalRandom.Next(matches.Count)];
+            var randomMatch = matches[Random.Shared.Next(matches.Count)];
 
 
             
@@ -337,7 +353,7 @@ namespace server.Services
         /// <param name="word"></param>
         /// <param name="bestMatch"></param>
         /// <param name="grid"></param>
-        static void AssignLetter(string word , Match bestMatch , char[,]grid)
+        static bool AssignLetter(string word , Match bestMatch , char[,]grid)
         {
 
             string w = word;
@@ -369,7 +385,9 @@ namespace server.Services
                 iCol = iCol + dcol;
                 wi++;
 
+                
             }
+            return true;
 
         }
 

@@ -17,16 +17,6 @@ namespace server.Controllers
     public class PuzzleController(IPuzzleService puzzleService) : Controller
     {
 
-        // list of endpoints for this controller
-        /*
-        
-        
-        */
-
-
-
-
-
 
         // call  the generate puzzle method from puzzle service
         [HttpGet]
