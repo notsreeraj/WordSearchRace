@@ -9,8 +9,9 @@ namespace server.DTOs
     {
         // string array 
 
+        // this is string array to support json serializatoin 
         public string[]? GridSingleD { get; set; } 
-        public int Size { get; set; }
+        public List<string>  ListOfWords { get; set; }
         // int size
     }
 }

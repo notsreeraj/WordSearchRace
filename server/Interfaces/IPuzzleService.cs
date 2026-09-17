@@ -12,6 +12,6 @@ namespace server.Interfaces
         // method to get puzzle with list of words and size (for testing purpose let it return a grid now )
            Puzzle GeneratePuzzle(int size);
             char[,] ConvertToGrid(string[] rows);
-            string[] GridToStringArr(char [,] grid);
+            string[] ConvertToStringArr(char [,] grid);
     }
 }

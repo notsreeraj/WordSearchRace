@@ -376,7 +376,7 @@ namespace server.Services
         /// </summary>
         /// <param name="grid">grid reference</param>
         /// <returns></returns>
-        public string[] GridToStringArr(char [,] grid)      
+        public string[] ConvertToStringArr(char [,] grid)      
         {
             
 
@@ -399,7 +399,7 @@ namespace server.Services
         {
             if (rows == null || rows.Length == 0)
             {
-                return new char[0, 0];
+                throw new NullReferenceException("Given String [] is empty");
             }
 
             int rowCount = rows.Length;

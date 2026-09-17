@@ -18,7 +18,7 @@ namespace server.Models
         {
             playerId
         };
-        public Puzzle? GamePuzzle { get; set; }
+        public Puzzle? Puzzle { get; set; }
 
     }
 }

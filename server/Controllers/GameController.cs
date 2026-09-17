@@ -15,7 +15,7 @@ namespace server.Controllers
 
     
     [Route("[controller]")]
-    public class GameController(IGameService _gameService ) : Controller
+    public class GameController(IGameService _gameService , IPuzzleService _puzzleService ) : Controller
     {
 
 
@@ -48,7 +48,7 @@ namespace server.Controllers
 
 
         [HttpPost("InitiateGame")]
-        public async Task<ActionResult<Game>> InitiateGame([FromBody]InitiateGameDTO initiateGameDto)
+        public async Task<ActionResult<GameDTO>> InitiateGame([FromBody]InitiateGameDTO initiateGameDto)
         {                      
             // do the data validation in this controller itself
             if(initiateGameDto == null)
@@ -59,8 +59,23 @@ namespace server.Controllers
             else
             {
                 Console.WriteLine($"game id from controller = {initiateGameDto.GameId}");
-            var game =  _gameService.InitiateGame(initiateGameDto.GameId,initiateGameDto.Size);
-            return Ok(game);
+            Game game =  _gameService.InitiateGame(initiateGameDto.GameId,initiateGameDto.Size);
+            
+            /*
+            converting game obect to game dto which also includes puzzledto
+            */
+            GameDTO   gamedto = new GameDTO{
+                Id =  game.Id,
+                Players = new List<string>(game.Players),
+                Puzzle = new PuzzleDto{
+                    // call the method from puzzle service char[] to string []
+                    GridSingleD = _puzzleService.ConvertToStringArr(game.Puzzle.Grid)
+                    ,ListOfWords = game.Puzzle.ListOfWords
+                }
+
+            };
+
+            return Ok(gamedto);
             }
 
             

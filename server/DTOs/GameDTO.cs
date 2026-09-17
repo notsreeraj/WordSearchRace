@@ -8,16 +8,17 @@ namespace server.DTOs
 {
     public class GameDTO
     {
-            public string Id { get; set; }       
-            public List<string> Players { get; set; } 
-            public Puzzle? GamePuzzle { get; set; }
+        // everything is req beacauer thhes info is imp for client to render
+            public required string Id { get; set; }       
+            public required List<string> Players { get; set; } 
+            public required PuzzleDto Puzzle { get; set; }
     }
         public class InitiateGameDTO
     {
         public string? GameId { get; set; }
         public int Size { get; set; }
     }
-    
+
 
 
 }

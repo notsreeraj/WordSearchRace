@@ -61,7 +61,7 @@ namespace server.Services
 
             // get the puzzlle with size and listChoice
             var newPuzzle =  _puzzleService.GeneratePuzzle(size);
-            currentGame.GamePuzzle = newPuzzle;
+            currentGame.Puzzle = newPuzzle;
 
             return  currentGame;
         }
