@@ -1,0 +1,67 @@
+Functional Requirements
+
+User Requirements
+
+Users can play against another player in a real-time race style match
+Users can view and interact with their word search puzzle on their device
+Users can drag or click to select a sequence of letters and submit as a word
+Users can see their opponent's progress as a progress bar in real time
+Users are notified when something goes wrong — opponent disconnect, matchmaking failure, or invalid selection
+Users can play as a guest or create an authenticated account
+Users see a post game summary after the match ends
+
+Matchmaking & Rooms
+
+Both players must confirm ready before the game starts
+Room is deleted automatically when the game ends
+Users can create a private room and share the room ID to invite a friend
+Users can use quick match to be paired with a random player instantly
+Room difficulty can be configured — grid size and word topic
+
+System Requirements
+
+System enforces a maximum of 2 players per room
+System assigns a unique shareable ID to every room
+System generates a unique word search puzzle per room based on difficulty settings
+System validates every word selection server side
+System prevents the same word from being claimed twice
+System updates both players progress in real time via WebSockets
+System determines the winner when a player solves the puzzle first and notifies both players simultaneously
+System enforces a submission rate limit per player to prevent spamming
+System handles edge cases — failed matchmaking, full rooms, and expired reconnection windows
+System detects player disconnects and provides a reconnection window
+System restores game state if a player reconnects within the allowed window
+
+Non Functional Requirements
+
+Performance
+
+Room creation must complete within 500ms
+Player must be able to join a game via room ID within 300ms
+Word selection must be received by the server within 200ms of submission
+Server must validate a selected word within 200ms
+Server must broadcast progress update to all players in the room within 300ms
+Puzzle generation must complete within 1000ms before the game starts
+
+Security
+
+System must enforce a rate limit of 1 word submission per 300ms per player
+All communication between client and server must be encrypted via HTTPS and WSS
+All word selection validation must happen server side — client input is never trusted
+
+Scalability
+
+System must support at least 100 simultaneous games (200 concurrent players)
+System must use Azure SignalR Service to support scaling across multiple server instances
+
+Reliability
+
+System must maintain 99% uptime
+System must provide a 30 second reconnection window before ending an active game
+System must notify a player if no opponent is found within 60 seconds and offer to retry
+System must prevent players from joining a full room and return a clear error message
+
+Cross-platform
+
+Game must be fully functional on Chrome, Firefox, Safari and Edge on desktop
+Game must be playable on mobile browsers but mobile optimization is post MVP

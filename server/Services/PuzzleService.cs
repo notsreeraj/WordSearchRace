@@ -7,7 +7,7 @@ using server.Models;
 
 namespace server.Services
 {
-    public class PuzzleService(IWordService _wordService , ILogger<PuzzleService> logger) : IPuzzleService
+    public class PuzzleService(IWordService _wordService) : IPuzzleService
     {
         
         // here i am using struct based on the recomendation by MS, 
