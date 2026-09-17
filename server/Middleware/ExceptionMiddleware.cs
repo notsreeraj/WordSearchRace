@@ -12,7 +12,7 @@ namespace server.Middleware
     public class ExceptionMiddleware(RequestDelegate next , ILogger<ExceptionMiddleware> logger ,IHostEnvironment env )
     {
         // method to invokec middleware
-        public async Task IvvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace server.Middleware
                 var response = env.IsDevelopment()
                 // if it is in development mode , include the stack trace with the log
                     ? new ApiException(context.Response.StatusCode ,ex.Message, ex.StackTrace )
-                    : new ApiException(context.Response.StatusCode,ex.Message, "Internal Server error");
+                    : new ApiException(context.Response.StatusCode,ex.Message, "Unhandled Internal Server error");
 
 
                 // logic to serialize the response

@@ -13,7 +13,7 @@ namespace server.Models
     /// <param name="playerId">Needs atleast one player to start a game</param>
     public class Game(string playerId)
     {
-        public string Id { get; set; }   = new Guid().ToString();
+        public string Id { get; set; }   =  Guid.NewGuid().ToString();
         public List<string> Players { get; set; } = new List<string>
         {
             playerId

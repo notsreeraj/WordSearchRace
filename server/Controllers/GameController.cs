@@ -5,13 +5,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using server.DTOs;
 using server.Interfaces;
 using server.Models;
 
 namespace server.Controllers
 {
+    // url/Game/methodname
+
+    
     [Route("[controller]")]
-    public class GameController(IGameService _gameService) : Controller
+    public class GameController(IGameService _gameService ) : Controller
     {
 
 
@@ -31,22 +35,35 @@ namespace server.Controllers
 
             // get[]
 
-        [HttpGet("CreateGame")]
+        [HttpGet("CreateGame/{playerId}")]
         public async Task<ActionResult<Game>> CreateMatchRoom(string playerId)
         {
             // call game service to instantiate a game instance
-           var newGame =  await _gameService.CreateNewGameAsync(playerId);
+           var newGame =   _gameService.CreateNewGame(playerId);
 
 
           return  newGame;
 
         }
 
-        [HttpGet("InitiateGame")]
-        public async Task<ActionResult<Game>> InitiateGame(string gameId , int size)
+
+        [HttpPost("InitiateGame")]
+        public async Task<ActionResult<Game>> InitiateGame([FromBody]InitiateGameDTO initiateGameDto)
         {                      
-        var game = await _gameService.InitiateGameAsync(gameId,size);
-        return game;
+            // do the data validation in this controller itself
+            if(initiateGameDto == null)
+            {
+                return BadRequest("Initiate game dto is  not valid");
+            }
+
+            else
+            {
+                Console.WriteLine($"game id from controller = {initiateGameDto.GameId}");
+            var game =  _gameService.InitiateGame(initiateGameDto.GameId,initiateGameDto.Size);
+            return Ok(game);
+            }
+
+            
 
         }
 

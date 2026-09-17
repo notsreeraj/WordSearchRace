@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace server.Services
 
         #region Memory
 
-        static Dictionary<string , Game>? _games = new Dictionary<string, Game>();
+        private readonly ConcurrentDictionary<string , Game>? _games = new ConcurrentDictionary<string, Game>();
         
         #endregion
 
@@ -24,11 +25,11 @@ namespace server.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<Game> CreateNewGameAsync(string playerID)
+        public  Game CreateNewGame(string playerID)
         {
-             var newGame = new Game(playerID);
+             var newGame =  new Game(playerID);
 
-             _games.Add( newGame.Id,newGame);
+             _games.TryAdd( newGame.Id,newGame);
 
             return   newGame;
         }
@@ -42,16 +43,27 @@ namespace server.Services
         /// <param name="listChoice"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<Game> InitiateGameAsync(string gameId, int size)
+        public Game InitiateGame(string gameId, int size)
         {
+            Console.WriteLine($"""
+            
+            *******
+            Game id = {gameId}
+            *********
+            
+            """);
             var currentGame  = FindGameID(gameId);
             if(currentGame == null) throw new ArgumentException("Game not found"); 
+            // we should also make sure that both players are ready /
+            // if on clicks ready he should be waiting for the next one to press ready
+
 
 
             // get the puzzlle with size and listChoice
-            var newPuzzle = _puzzleService.GeneratePuzzle(size);
+            var newPuzzle =  _puzzleService.GeneratePuzzle(size);
+            currentGame.GamePuzzle = newPuzzle;
 
-            return currentGame;
+            return  currentGame;
         }
 
         /// <summary>
@@ -61,12 +73,12 @@ namespace server.Services
         /// </summary>
         /// <param name="gameId"></param>
         /// <returns></returns>
-        static Game? FindGameID(string gameId)
+        private Game? FindGameID(string gameId)
         {
            
-
-           if(_games.ContainsKey(gameId)) return _games[gameId];
-            else return null;
+            // here i changed the containskey to trygetvalue to make it thread safe . 
+            // the previous can cause situatoin where key can be delet by other calls to the same dictionary
+            return _games.TryGetValue(gameId, out var game) ? game: null;
              
         }
 

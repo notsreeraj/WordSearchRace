@@ -14,26 +14,26 @@ namespace server.Controllers
     /// </summary>
     /// <param name="puzzleService"></param>
     [Route("[controller]")]
-    public class PuzzleController(IPuzzleService puzzleService) : Controller
+    public class PuzzleController() : Controller
     {
 
 
         // call  the generate puzzle method from puzzle service
-        [HttpGet]
-        public ActionResult<string[]> GetPuzzle()
-        {
-            var grid =  puzzleService.GeneratePuzzle(20);
-            ;
+        // [HttpGet]
+        // public ActionResult<string[]> GetPuzzle()
+        // {
+        //     var puzzle =  puzzleService.GeneratePuzzle(20);
+        //     var grid = puzzle.Grid;
 
-             var rows = Enumerable.Range(0, grid.GetLength(0))
-            .Select(row => new string(Enumerable.Range(0, grid.GetLength(1))
-                .Select(col => grid[row, col] == '\0' ? '*' : grid[row, col])
-                .ToArray()))
-            .ToArray();
+        //      var rows = Enumerable.Range(0, grid.GetLength(0))
+        //     .Select(row => new string(Enumerable.Range(0, grid.GetLength(1))
+        //         .Select(col => grid[row, col] == '\0' ? '*' : grid[row, col])
+        //         .ToArray()))
+        //     .ToArray();
 
-        return Ok(rows);
+        // return Ok(rows);
 
-        }
+        // }
 
     }
 }

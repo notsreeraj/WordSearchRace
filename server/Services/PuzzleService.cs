@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using server.Interfaces;
+using server.Models;
 
 namespace server.Services
 {
-    public class PuzzleService(IWordService _wordService) : IPuzzleService
+    public class PuzzleService(IWordService _wordService , ILogger<PuzzleService> logger) : IPuzzleService
     {
         
         // here i am using struct based on the recomendation by MS, 
@@ -38,64 +39,14 @@ namespace server.Services
             Console.WriteLine();
         }
 
-                // Words to test on a 10x10 grid
-           static string[] Words10x10 =
-                {
-            "CAT",
-            "DOG",
-            "SUN",
-            "APPLE",
-            "TIGER",
-            "RIVER",
-            "COMPUTER",     // 8 chars
-            "KEYBOARDS",    // 9 chars, tight fit
-            "ABCDEFGHIJ",   // exactly 10 chars
-            "ELEPHANTINE"   // 11 chars — impossible, should fail to place
-        };
-
-                // Words to test on a 15x15 grid
-             static string[] Words15x15 =
-                {
-            "TESTING",
-            "RAGE",
-            "PILLAR",
-            "TOPPER",
-            "UMBRO",
-            "STING",
-            "RAGING",
-            "PILE",
-            "ELEPHANT",
-            "MOUNTAIN",
-            "CHOCOLATE",
-            "COMPUTER",
-            "KEYBOARD",
-            "ABCDEFGHIJKLMNO",   // exactly 15 chars
-            "SUPERCALIFRAGILI"   // 16 chars — impossible, should fail to place
-        };
-
-                    // Words to test on a 20x20 grid
-            static string[] Words20x20 =
-                    {
-                "MOUNTAIN",
-                "ELEPHANT",
-                "KEYBOARD",
-                "CHOCOLATE",
-                "COMPUTER",
-                "BASKETBALL",
-                "UNIVERSITY",
-                "INTERNATIONAL",       // 13 chars
-                "RESPONSIBILITY",      // 14 chars
-                "ABCDEFGHIJKLMNOPQRST",   // exactly 20 chars
-                   // 21 chars — impossible, should fail to place
-            };
-
+   
     /// <summary>
     ///  the main method to generate a puzzle based on  size and list of choice
     /// </summary>
     /// <param name="size"></param>
     /// <param name="listChoice"></param>
     /// <returns></returns>
-        public  char[,] GeneratePuzzle(int size )
+        public   Puzzle GeneratePuzzle(int size )
         {
     
 
@@ -103,14 +54,14 @@ namespace server.Services
         var words = _wordService.GetWords(size);
         var sorterdWords= words.OrderByDescending(w => w.Length).ToList();
         ////now test the methods inside a loop
-        char[,] grid = new char[size,size];
+        char[,] newGrid = new char[size,size];
 
         List<string> placedWords = new List<string>();
         List<string> failedWords = new List<string>();
 
         foreach (string word in sorterdWords)
         {
-        bool placed = AddWord(word, grid); // assuming you switched this to return bool, as discussed earlier
+        bool placed = AddWord(word, newGrid); // assuming you switched this to return bool, as discussed earlier
         if (placed)
             placedWords.Add(word);
         else
@@ -121,7 +72,21 @@ namespace server.Services
         {
             throw new InvalidOperationException("No words could be placed on the grid.");
         }
-        return grid;
+
+        var NewPuzzle = new Puzzle
+        {
+          Grid = newGrid,
+          ListOfWords = words
+            
+        };
+        PrintGrid(newGrid);
+            
+
+            
+        
+
+
+        return NewPuzzle;
 
 
             
@@ -140,12 +105,12 @@ namespace server.Services
             // iterate through grid 
             // check 2 conditions  =>  1:  is current cell empty , 2: does current cell contain same letter as the first letter of the word
 
-            Console.WriteLine($"word == {word}");
+            // Console.WriteLine($"word == {word}");
 
             string currentWord = word;
             char[ , ] currentGrid = Grid;
 
-            int BestScore = 0;
+        
             List<Match> Matches = new List<Match>();
 
 
@@ -369,15 +334,15 @@ namespace server.Services
             {
 
 
-                Console.WriteLine($"""
-                    this is inside assig letter method
-                    ********************
+                // Console.WriteLine($"""
+                //     this is inside assig letter method
+                //     ********************
 
-                    iRow ={iRow}
-                    iCol ={iCol}
-                    ********************
+                //     iRow ={iRow}
+                //     iCol ={iCol}
+                //     ********************
 
-                    """);
+                //     """);
 
                 // assign letter to the grid appropriately
                 Grid[iRow,iCol] = word[wi];
@@ -406,9 +371,58 @@ namespace server.Services
             }
         }
 
-        public char[,] GeneratePuzzle(char[,] grid)
+        /// <summary>
+        /// this method converts char[,] to string[] to make json friendlu
+        /// </summary>
+        /// <param name="grid">grid reference</param>
+        /// <returns></returns>
+        public string[] GridToStringArr(char [,] grid)      
         {
-            throw new NotImplementedException();
+            
+
+             var rows = Enumerable.Range(0, grid.GetLength(0))
+            .Select(row => new string(Enumerable.Range(0, grid.GetLength(1))
+                .Select(col => grid[row, col] == '\0' ? '*' : grid[row, col])
+                .ToArray()))
+            .ToArray();
+
+        return rows;
+
         }
+
+        /// <summary>
+        /// this method converts string[] to char[,]
+        /// </summary>
+        /// <param name="rows">string [] referenc from dto</param>
+        /// <returns></returns>
+        public char[,] ConvertToGrid(string[] rows)
+        {
+            if (rows == null || rows.Length == 0)
+            {
+                return new char[0, 0];
+            }
+
+            int rowCount = rows.Length;
+            int colCount = rows[0].Length;
+
+            char[,] grid = new char[rowCount, colCount];
+
+            for (int r = 0; r < rowCount; r++)
+            {
+                // Optional: Handles variable-length strings safely
+                int length = Math.Min(rows[r].Length, colCount);
+
+                for (int c = 0; c < length; c++)
+                {
+                    // Replaces asterisks back to null chars if needed
+                    char currentChar = rows[r][c];
+                    grid[r, c] = currentChar == '*' ? '\0' : currentChar;
+                }
+            }
+
+            return grid;
+        }
+
+
     }
 }

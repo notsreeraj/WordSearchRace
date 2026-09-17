@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
 });
 
 // addscoped will make sure that there puzzleservice instance for each request
-builder.Services.AddScoped<IPuzzleService,PuzzleService>();
+builder.Services.AddSingleton<IPuzzleService,PuzzleService>();
 builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IWordService , WordService>();
 
@@ -36,8 +36,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("Client");
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

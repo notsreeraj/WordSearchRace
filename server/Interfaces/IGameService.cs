@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,12 +9,12 @@ namespace server.Interfaces
 {
     public interface IGameService
     {
-        static Dictionary<string , Game>? _games ;
+        static ConcurrentDictionary<string , Game>? _games ;
 
-         Task<Game> CreateNewGameAsync(string playerID);
+         Game CreateNewGame(string playerID);
 
 
-         Task<Game> InitiateGameAsync(string gameId, int size );
+         Game InitiateGame(string gameId, int size );
 
     }
 }
