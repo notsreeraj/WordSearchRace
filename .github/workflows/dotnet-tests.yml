@@ -1,0 +1,31 @@
+@'
+name: .NET Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore WS.sln
+
+      - name: Build
+        run: dotnet build WS.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test WS.sln --no-build --configuration Release --logger "console;verbosity=normal"
+'@ | Out-File -FilePath .github\workflows\dotnet-tests.yml -Encoding utf8

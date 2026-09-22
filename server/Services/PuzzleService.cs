@@ -359,19 +359,6 @@ namespace server.Services
 
 
         /// <summary>
-        /// this method prints all matches
-        /// used to debug 
-        /// </summary>
-        /// <param name="matches"></param>
-        static void PrintMatches(List<Match> matches)
-        {
-            foreach (Match m in matches)
-            {
-                Console.WriteLine(m);
-            }
-        }
-
-        /// <summary>
         /// this method converts char[,] to string[] to make json friendlu
         /// </summary>
         /// <param name="grid">grid reference</param>
