@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// addscoped will make sure that there puzzleservice instance for each request
+// everyting is singleton 
 builder.Services.AddSingleton<IPuzzleService,PuzzleService>();
 builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IWordService , WordService>();
