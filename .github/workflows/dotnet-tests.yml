@@ -1,4 +1,4 @@
-@'
+
 name: .NET Tests
 
 on:
@@ -28,4 +28,3 @@ jobs:
 
       - name: Test
         run: dotnet test WS.sln --no-build --configuration Release --logger "console;verbosity=normal"
-'@ | Out-File -FilePath .github\workflows\dotnet-tests.yml -Encoding utf8
