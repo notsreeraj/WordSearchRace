@@ -9,7 +9,7 @@ using server.Models;
 
 namespace server.Services
 {
-    public class GameService(IPuzzleService _puzzleService) : IGameService
+    public class GameService(IPuzzleService _puzzleService , IPlayerService _playerService) : IGameService
     {
 
 
@@ -54,7 +54,8 @@ namespace server.Services
             """);
             var currentGame  = FindGameID(gameId);
             if(currentGame == null) throw new ArgumentException("Game not found"); 
-            // we should also make sure that both players are ready /
+            // check to confirm there is both player in the game
+            if(currentGame.Players.Count != 2) throw new Exception("2 Players must be joined to initiate a game ");
             // if on clicks ready he should be waiting for the next one to press ready
 
 
@@ -67,6 +68,35 @@ namespace server.Services
         }
 
         /// <summary>
+        /// method to let a player join a game
+        /// </summary>
+        /// <param name="gamedID"></param>
+        /// <param name="newPlayeID"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public Game JoinGame(string gameID, string newPlayerID)
+        {
+            // validate whether the player is active
+            if(_playerService.IsPlayerActive(newPlayerID)) throw new Exception("Player Not Valid");
+
+            // validate the gameID
+            var currentGame  = FindGameID(gameID);
+            if(currentGame == null) throw new ArgumentException("Game not found");
+
+
+            // also check if there is already 2 player in the game 
+            if(currentGame.Players.Count == 2 ) throw new Exception("Reached Maximum amount of players in Game"); 
+            
+            // use the currentGame and add the new player to the playeslist
+            currentGame.Players.Add(newPlayerID);                 
+            return currentGame;
+        }
+
+
+
+        #region Helper Methods
+
+        /// <summary>
         /// finds a game with id
         /// returns null if not found
         /// here i wrote game? becaue this method may return null
@@ -77,10 +107,13 @@ namespace server.Services
         {
            
             // here i changed the containskey to trygetvalue to make it thread safe . 
-            // the previous can cause situatoin where key can be delet by other calls to the same dictionary
+            // the previous can cause situatoin where key can be deleted by other calls to the same dictionary
             return _games.TryGetValue(gameId, out var game) ? game: null;
              
         }
+
+
+        #endregion
 
 
 

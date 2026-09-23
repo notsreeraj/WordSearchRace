@@ -24,6 +24,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton<IPuzzleService,PuzzleService>();
 builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IWordService , WordService>();
+builder.Services.AddSingleton<IPlayerService , PlayerService>();
+
 
 
 var app = builder.Build();

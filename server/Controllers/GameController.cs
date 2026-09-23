@@ -55,7 +55,9 @@ namespace server.Controllers
             {
                 return BadRequest("Initiate game dto is  not valid");
             }
-
+            // we should also make sure that both players are ready 
+            // let us make sure that in the front end the dto bool property is only true when both playes are ready
+            if(!initiateGameDto.PlayersReady) return BadRequest("Players must be ready to initiate a game");
             else
             {
                 Console.WriteLine($"game id from controller = {initiateGameDto.GameId}");
@@ -66,8 +68,8 @@ namespace server.Controllers
             */
             GameDTO   gamedto = new GameDTO{
                 Id =  game.Id,
-                Players = new List<string>(game.Players),
-                Puzzle = new PuzzleDto{
+                Players = game.Players,
+                Puzzledto = new PuzzleDto{
                     // call the method from puzzle service char[] to string []
                     GridSingleD = _puzzleService.ConvertToStringArr(game.Puzzle.Grid)
                     ,ListOfWords = game.Puzzle.ListOfWords
@@ -82,6 +84,30 @@ namespace server.Controllers
 
         }
 
+
+
+        [HttpPost("JoinGame")]
+        public async  Task<ActionResult<GameDTO>> JoinGame([FromBody]JoinGameDTO joinGameDTO){
+            if(joinGameDTO == null){
+                return BadRequest("Not enough info to conitinue");
+            }
+
+            else{
+                var gameToJoin = _gameService.JoinGame(joinGameDTO.GameID,joinGameDTO.NewPlayerID);
+
+                GameDTO gameDTO = new GameDTO{
+                    Id = gameToJoin.Id,
+                    Players = gameToJoin.Players,
+                    Puzzledto = new PuzzleDto{
+                    // call the method from puzzle service char[] to string []
+                    GridSingleD = _puzzleService.ConvertToStringArr(gameToJoin.Puzzle.Grid)
+                    ,ListOfWords = gameToJoin.Puzzle.ListOfWords
+                }
+
+                };
+                return Ok(gameDTO);
+            }
+        }
         #endregion
     }
 }

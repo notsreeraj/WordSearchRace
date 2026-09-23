@@ -9,12 +9,13 @@ namespace server.Interfaces
 {
     public interface IGameService
     {
-        static ConcurrentDictionary<string , Game>? _games ;
+         
 
          Game CreateNewGame(string playerID);
 
 
          Game InitiateGame(string gameId, int size );
+         Game JoinGame(string gamedID , string newPlayeID);
 
     }
 }
