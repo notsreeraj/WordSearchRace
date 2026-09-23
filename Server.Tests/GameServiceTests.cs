@@ -12,10 +12,10 @@ namespace Server.Tests
     public class GameServiceTests
     {
         private readonly GameService _gameService;
-
+        private readonly PlayerService _playerService = new PlayerService();
 
         public GameServiceTests(){
-             _gameService = new GameService(null!,null!);
+             _gameService = new GameService(null!,_playerService);
         }
 
         // test the no game found
