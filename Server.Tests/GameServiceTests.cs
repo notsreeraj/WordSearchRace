@@ -6,6 +6,8 @@ using Xunit;
 using server.Services;
 using Microsoft.AspNetCore.Mvc;
 using server.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Server.Tests
 {
@@ -13,9 +15,10 @@ namespace Server.Tests
     {
         private readonly GameService _gameService;
         private readonly PlayerService _playerService = new PlayerService();
+        private readonly ILogger<GameService> _loggger = NullLogger<GameService>.Instance ;
 
         public GameServiceTests(){
-             _gameService = new GameService(null!,_playerService,null!);
+             _gameService = new GameService(null!,_playerService, _loggger);
         }
 
         // test the no game found
