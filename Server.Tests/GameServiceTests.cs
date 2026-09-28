@@ -15,7 +15,7 @@ namespace Server.Tests
         private readonly PlayerService _playerService = new PlayerService();
 
         public GameServiceTests(){
-             _gameService = new GameService(null!,_playerService);
+             _gameService = new GameService(null!,_playerService,null!);
         }
 
         // test the no game found
@@ -70,9 +70,12 @@ namespace Server.Tests
         [Fact]
         public void JoingGameInvalidGameID()
         {
+            // requirement need valid playe id , IsPlayerActive() must should positive
+
             // arrange
             string gameID = "ifbghb";
             string playerID = "dosn";
+            _playerService.AddNewActivePlayer(playerID);
 
             Assert.Throws<ArgumentException>(()=> _gameService.JoinGame(gameID,playerID));
         }
@@ -81,11 +84,20 @@ namespace Server.Tests
         [Fact]
         public void JoingGameMaxPlayerReached()
         {
-            // arrange
-            string gameID = "ifbghb";
-            string playerID = "dosn";
+            // requirement IspLayerActive must return true.
+            // Must have a valid gameId
+            // Game nust have more that 2 players
 
-            Assert.Throws<Exception>(()=> _gameService.JoinGame(gameID,playerID));
+            // arrange
+            
+            string playerID = "dosn";
+            _playerService.AddNewActivePlayer(playerID);
+            Game testGame =_gameService.CreateNewGame(playerID);
+            // add 1 more players to the gameplayer list
+            testGame.Players.Add("iughbg;");
+            Console.WriteLine($"Player count in {testGame.Id} is {testGame.Players.Count}");
+
+            Assert.Throws<Exception>(()=> _gameService.JoinGame(testGame.Id,playerID));
         }
         
     }

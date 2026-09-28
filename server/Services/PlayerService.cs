@@ -16,5 +16,11 @@ namespace server.Services
         {
             return ActivePlayers.Contains(playerID);
         }
+
+        // method to a player to active player list
+        public void AddNewActivePlayer(string playerID)
+        {
+            ActivePlayers.Add(playerID);
+        }
     }
 }

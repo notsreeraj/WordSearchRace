@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing.Tree;
 using server.Interfaces;
 using server.Models;
+using Microsoft.Extensions.Logging;
 
 namespace server.Services
 {
-    public class GameService(IPuzzleService _puzzleService , IPlayerService _playerService) : IGameService
+    public class GameService(IPuzzleService _puzzleService , IPlayerService _playerService , ILogger<GameService> _logger) : IGameService
     {
 
 
@@ -28,6 +29,7 @@ namespace server.Services
         public  Game CreateNewGame(string playerID)
         {
              var newGame =  new Game(playerID);
+             //newGame.Players.Add(playerID);
 
              _games.TryAdd( newGame.Id,newGame);
 
@@ -45,13 +47,7 @@ namespace server.Services
         /// <exception cref="NotImplementedException"></exception>
         public Game InitiateGame(string gameId, int size)
         {
-            Console.WriteLine($"""
-            
-            *******
-            Game id = {gameId}
-            *********
-            
-            """);
+           _logger.LogDebug("Initiating game {gameId} with size {size}",gameId, size);
             var currentGame  = FindGameID(gameId);
             if(currentGame == null) throw new ArgumentException("Game not found"); 
             // check to confirm there is both player in the game
@@ -81,7 +77,7 @@ namespace server.Services
 
             // validate the gameID
             var currentGame  = FindGameID(gameID);
-            if(currentGame == null) throw new ArgumentException("Game not found");
+             if(currentGame == null) throw new ArgumentException("Game not found");
 
 
             // also check if there is already 2 player in the game 
