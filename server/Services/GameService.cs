@@ -109,6 +109,16 @@ namespace server.Services
         }
 
 
+        // method to check if a game has max players
+        public bool IsMaxNumPlayer(string gameId)
+        {
+            var game = FindGameID(gameId);
+            if(game == null) throw new Exception("Game Not Found");
+
+            return (game.Players.Count == 2);
+        }
+
+
         #endregion
 
 

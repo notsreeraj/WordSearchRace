@@ -35,7 +35,7 @@ namespace server.Controllers
 
             // get[]
 
-        [HttpGet("CreateGame/{playerId}")]
+        [HttpPost("CreateGame/{playerId}")]
         public async Task<ActionResult<Game>> CreateMatchRoom(string playerId)
         {
             // call game service to instantiate a game instance
@@ -47,42 +47,42 @@ namespace server.Controllers
         }
 
 
-        [HttpPost("InitiateGame")]
-        public async Task<ActionResult<GameDTO>> InitiateGame([FromBody]InitiateGameDTO initiateGameDto)
-        {                      
-            // do the data validation in this controller itself
-            if(initiateGameDto == null)
-            {
-                return BadRequest("Initiate game dto is  not valid");
-            }
-            // we should also make sure that both players are ready 
-            // let us make sure that in the front end the dto bool property is only true when both playes are ready
-            if(!initiateGameDto.PlayersReady) return BadRequest("Players must be ready to initiate a game");
-            else
-            {
-                Console.WriteLine($"game id from controller = {initiateGameDto.GameId}");
-            Game game =  _gameService.InitiateGame(initiateGameDto.GameId,initiateGameDto.Size);
+        // [HttpPost("InitiateGame")]
+        // public async Task<ActionResult<GameDTO>> InitiateGame([FromBody]InitiateGameDTO initiateGameDto)
+        // {                      
+        //     // do the data validation in this controller itself
+        //     if(initiateGameDto == null)
+        //     {
+        //         return BadRequest("Initiate game dto is  not valid");
+        //     }
+        //     // we should also make sure that both players are ready 
+        //     // let us make sure that in the front end the dto bool property is only true when both playes are ready
+        //     if(!initiateGameDto.PlayersReady) return BadRequest("Players must be ready to initiate a game");
+        //     else
+        //     {
+        //         Console.WriteLine($"game id from controller = {initiateGameDto.GameId}");
+        //     Game game =  _gameService.InitiateGame(initiateGameDto.GameId,initiateGameDto.Size);
             
-            /*
-            converting game obect to game dto which also includes puzzledto
-            */
-            GameDTO   gamedto = new GameDTO{
-                Id =  game.Id,
-                Players = game.Players,
-                Puzzledto = new PuzzleDto{
-                    // call the method from puzzle service char[] to string []
-                    GridSingleD = _puzzleService.ConvertToStringArr(game.Puzzle.Grid)
-                    ,ListOfWords = game.Puzzle.ListOfWords
-                }
+        //     /*
+        //     converting game obect to game dto which also includes puzzledto
+        //     */
+        //     GameDTO   gamedto = new GameDTO{
+        //         Id =  game.Id,
+        //         Players = game.Players,
+        //         Puzzledto = new PuzzleDto{
+        //             // call the method from puzzle service char[] to string []
+        //             GridSingleD = _puzzleService.ConvertToStringArr(game.Puzzle.Grid)
+        //             ,ListOfWords = game.Puzzle.ListOfWords
+        //         }
 
-            };
+        //     };
 
-            return Ok(gamedto);
-            }
+        //     return Ok(gamedto);
+        //     }
 
             
 
-        }
+        // }
 
 
 

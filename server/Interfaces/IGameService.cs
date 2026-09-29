@@ -16,6 +16,7 @@ namespace server.Interfaces
 
          Game InitiateGame(string gameId, int size );
          Game JoinGame(string gamedID , string newPlayeID);
+         bool IsMaxNumPlayer(string gameID);
 
     }
 }

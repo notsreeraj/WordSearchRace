@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.SignalR;
+using server.Hubs;
 using server.Interfaces;
 using server.Middleware;
 using server.Services;
@@ -26,7 +28,8 @@ builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IWordService , WordService>();
 builder.Services.AddSingleton<IPlayerService , PlayerService>();
 
-
+// adding signal service
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -37,9 +40,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseCors("Client");
 
 app.UseAuthorization();
+
+app.MapHub<GameHub>("/gamehub");
+
 
 app.MapControllers();
 
