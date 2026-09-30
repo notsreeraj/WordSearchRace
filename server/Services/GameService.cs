@@ -73,7 +73,7 @@ namespace server.Services
         public Game JoinGame(string gameID, string newPlayerID)
         {
             // validate whether the player is active
-            if(!_playerService.IsPlayerActive(newPlayerID)) throw new Exception("Player Not Valid");
+            //if(!_playerService.IsPlayerActive(newPlayerID)) throw new Exception("Player Not Valid");
 
             // validate the gameID
             var currentGame  = FindGameID(gameID);
@@ -114,8 +114,8 @@ namespace server.Services
         {
             var game = FindGameID(gameId);
             if(game == null) throw new Exception("Game Not Found");
-
-            return (game.Players.Count == 2);
+            _logger.LogDebug("Number of player in the game is {game.Players.Count}",game.Players.Count);
+            return game.Players.Count == 2;
         }
 
 

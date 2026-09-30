@@ -1,10 +1,13 @@
 
 import './App.css'
-import GameScreen from './screens/GameScreen'
+// import GameScreen from './screens/GameScreen'
+import SignalRTestScreen from './screens/SignalRTestScreen'
+
 
 function App() {
   return (
-    <GameScreen />
+   // <GameScreen />
+   <SignalRTestScreen />
   )
 }
 

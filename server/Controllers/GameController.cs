@@ -93,7 +93,7 @@ namespace server.Controllers
             }
 
             else{
-                var gameToJoin = _gameService.JoinGame(joinGameDTO.GameID,joinGameDTO.NewPlayerID);
+                var gameToJoin = _gameService.JoinGame(joinGameDTO.GameID,joinGameDTO.PlayerID);
 
                 GameDTO gameDTO = new GameDTO{
                     Id = gameToJoin.Id,

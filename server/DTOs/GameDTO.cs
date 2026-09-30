@@ -11,7 +11,7 @@ namespace server.DTOs
         // everything is req beacauer thhes info is imp for client to render
             public required string Id { get; set; }       
             public required List<string> Players { get; set; } 
-            public required PuzzleDto Puzzledto { get; set; }
+            public  PuzzleDto? Puzzledto { get; set; }
     }
         public class InitiateGameDTO
     {
@@ -24,7 +24,13 @@ namespace server.DTOs
     public class JoinGameDTO
     {
         public required string GameID { get; set; }
-        public required string NewPlayerID { get; set; }
+        public required string PlayerID { get; set; }
+    }
+
+    public class CreateGameDTO
+    {
+        public required string GameID { get; set; }
+        public int MyProperty { get; set; }
     }
 
 

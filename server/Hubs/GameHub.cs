@@ -4,29 +4,45 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.ObjectPool;
+using server.DTOs;
 using server.Interfaces;
 
 namespace server.Hubs
 {
     public class GameHub(IGameService _gameService) :Hub
     {
-        // method to create a group and joing 
 
-        public async Task JoinRoom(string gameId){
-            await Groups.AddToGroupAsync(Context.ConnectionId,gameId);
 
-            // if there is already 2 players in teh game broacast message click ready to start game 
-            if (_gameService.IsMaxNumPlayer(gameId))
+        public async Task CreateGame(string playerID)
+        {
+            // create new game instance via gameserivce
+            var game = _gameService.CreateNewGame(playerID);
+            // add the new connecionstringID to the group with name as game id
+            await Groups.AddToGroupAsync(Context.ConnectionId, game.Id);
+            // send the caller the message with gameid  (Clietns.Caller.SendAsync)
+            await Clients.Caller.SendAsync("GameCreatedAndWaitingForPlayer" , game.Id );
+        }
+
+
+
+
+    
+        public async Task JoinGame(JoinGameDTO joinGameDTO){
+            // add the new connectionString id to the group with name as game id from dto
+            await Groups.AddToGroupAsync(Context.ConnectionId,joinGameDTO.GameID);
+            // call the join game method from gameservice via joingame method
+            var game = _gameService.JoinGame(joinGameDTO.GameID,joinGameDTO.PlayerID);
+
+
+            GameDTO gameDto = new GameDTO
             {
-                // notify the players that they can initiate game by clicking ready
-                // herr the first argument of sendAsync is an event not a method
-                await Clients.Group(gameId).SendAsync("BothPlayersReady","Click Ready to start the race...");
-            }
-            else
-            {
-                // let the player know that they are waiting for new player.
-                await Clients.Caller.SendAsync("WaitingForPlayer","Waiting for Opponent to Join..");
-            }
+                Id = game.Id,
+                Players = game.Players,
+                Puzzledto = null
+
+            };
+            // send the group message that the room is filled  
+            await Clients.Group(game.Id).SendAsync("RoomReady", gameDto);
 
         }
         
