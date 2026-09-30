@@ -26,13 +26,18 @@ namespace server.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public  Game CreateNewGame(string playerID)
+        public  Game CreateNewGame(string playerID , int size)
         {
              var newGame =  new Game(playerID);
+             newGame.Puzzle =  _puzzleService.GeneratePuzzle(size);
+
+             
              //newGame.Players.Add(playerID);
 
              _games.TryAdd( newGame.Id,newGame);
 
+
+                 
             return   newGame;
         }
 
@@ -73,7 +78,7 @@ namespace server.Services
         public Game JoinGame(string gameID, string newPlayerID)
         {
             // validate whether the player is active
-            //if(!_playerService.IsPlayerActive(newPlayerID)) throw new Exception("Player Not Valid");
+            // if(!_playerService.IsPlayerActive(newPlayerID)) throw new Exception("Player Not Valid");
 
             // validate the gameID
             var currentGame  = FindGameID(gameID);

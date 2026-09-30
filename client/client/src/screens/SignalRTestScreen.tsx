@@ -37,7 +37,10 @@ const SignalRTestScreen = () => {
 
   const createGame = async () => {
     if (connection) {
-      await connection.invoke("CreateGame", "firstplayer");
+      await connection.invoke("CreateGame", {
+        playerID: "FirstPlayer",
+        size : 20
+      });
     }
   };
 

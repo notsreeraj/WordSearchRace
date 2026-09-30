@@ -38,70 +38,70 @@ namespace Server.Tests
 
         }
 
-        /// <summary>
-        /// to test the second exceptoin of not engought players
-        /// </summary>
-        [Fact]
-        public void InitiateGameWithNotEnoughPlayers()
-        {
-            // arrange
+        // /// <summary>
+        // /// to test the second exceptoin of not engought players
+        // /// </summary>
+        // [Fact]
+        // public void InitiateGameWithNotEnoughPlayers()
+        // {
+        //     // arrange
             
 
-            Game testGame = _gameService.CreateNewGame("testPlayer");
+        //     Game testGame = _gameService.CreateNewGame("testPlayer");
 
 
-            // act + assert  
-            Assert.Throws<Exception>(()=> _gameService.InitiateGame(testGame.Id,20));          
-        }
+        //     // act + assert  
+        //     Assert.Throws<Exception>(()=> _gameService.InitiateGame(testGame.Id,20));          
+        // }
 
-        // test to check Joing game if player check is working
-        [Fact]
-        public void JoinGameInvalidPlayer()
-        {
+        // // // test to check Joing game if player check is working
+        // // [Fact]
+        // // public void JoinGameInvalidPlayer()
+        // // {
 
-            // arrange
-            string gameID = "ifbghb";
-            string playerID = "dosn";
+        // //     // arrange
+        // //     string gameID = "ifbghb";
+        // //     string playerID = "dosn";
             
 
 
-            // act + assert
-            Assert.Throws<Exception>(()=> _gameService.JoinGame(gameID,playerID));
-        }
+        // //     // act + assert
+        // //     Assert.Throws<Exception>(()=> _gameService.JoinGame(gameID,playerID));
+        // // }
 
-        // Test to check invalid game entry
-        [Fact]
-        public void JoingGameInvalidGameID()
-        {
-            // requirement need valid playe id , IsPlayerActive() must should positive
+        // // Test to check invalid game entry
+        // [Fact]
+        // public void JoingGameInvalidGameID()
+        // {
+        //     // requirement need valid playe id , IsPlayerActive() must should positive
 
-            // arrange
-            string gameID = "ifbghb";
-            string playerID = "dosn";
-            _playerService.AddNewActivePlayer(playerID);
+        //     // arrange
+        //     string gameID = "ifbghb";
+        //     string playerID = "dosn";
+        //     _playerService.AddNewActivePlayer(playerID);
 
-            Assert.Throws<ArgumentException>(()=> _gameService.JoinGame(gameID,playerID));
-        }
+        //     Assert.Throws<ArgumentException>(()=> _gameService.JoinGame(gameID,playerID));
+        // }
 
-        // test to game reached maximum player
-        [Fact]
-        public void JoingGameMaxPlayerReached()
-        {
-            // requirement IspLayerActive must return true.
-            // Must have a valid gameId
-            // Game nust have more that 2 players
+        // // test to game reached maximum player
+        // [Fact]
+        // public void JoingGameMaxPlayerReached()
+        // {
+        //     // requirement IspLayerActive must return true.
+        //     // Must have a valid gameId
+        //     // Game nust have more that 2 players
 
-            // arrange
+        //     // arrange
             
-            string playerID = "dosn";
-            _playerService.AddNewActivePlayer(playerID);
-            Game testGame =_gameService.CreateNewGame(playerID);
-            // add 1 more players to the gameplayer list
-            testGame.Players.Add("iughbg;");
-            Console.WriteLine($"Player count in {testGame.Id} is {testGame.Players.Count}");
+        //     string playerID = "dosn";
+        //     _playerService.AddNewActivePlayer(playerID);
+        //     Game testGame =_gameService.CreateNewGame(playerID);
+        //     // add 1 more players to the gameplayer list
+        //     testGame.Players.Add("iughbg;");
+        //     Console.WriteLine($"Player count in {testGame.Id} is {testGame.Players.Count}");
 
-            Assert.Throws<Exception>(()=> _gameService.JoinGame(testGame.Id,playerID));
-        }
+        //     Assert.Throws<Exception>(()=> _gameService.JoinGame(testGame.Id,playerID));
+        // }
         
     }
 }

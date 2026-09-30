@@ -39,7 +39,7 @@ namespace server.Controllers
         public async Task<ActionResult<Game>> CreateMatchRoom(string playerId)
         {
             // call game service to instantiate a game instance
-           var newGame =   _gameService.CreateNewGame(playerId);
+           var newGame =   _gameService.CreateNewGame(playerId,43);
 
 
           return  newGame;

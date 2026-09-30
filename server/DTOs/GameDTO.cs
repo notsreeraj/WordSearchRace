@@ -29,8 +29,8 @@ namespace server.DTOs
 
     public class CreateGameDTO
     {
-        public required string GameID { get; set; }
-        public int MyProperty { get; set; }
+        public required string PlayerID { get; set; }
+        public int Size { get; set; }
     }
 
 

@@ -9,14 +9,15 @@ using server.Interfaces;
 
 namespace server.Hubs
 {
-    public class GameHub(IGameService _gameService) :Hub
+    public class GameHub(IGameService _gameService , IPuzzleService _puzzleService) :Hub
     {
 
 
-        public async Task CreateGame(string playerID)
+        public async Task CreateGame(CreateGameDTO createGameDto)
         {
             // create new game instance via gameserivce
-            var game = _gameService.CreateNewGame(playerID);
+            var game = _gameService.CreateNewGame(createGameDto.PlayerID,createGameDto.Size);
+            
             // add the new connecionstringID to the group with name as game id
             await Groups.AddToGroupAsync(Context.ConnectionId, game.Id);
             // send the caller the message with gameid  (Clietns.Caller.SendAsync)
@@ -38,7 +39,11 @@ namespace server.Hubs
             {
                 Id = game.Id,
                 Players = game.Players,
-                Puzzledto = null
+                Puzzledto = new PuzzleDto
+                {
+                    GridSingleD = _puzzleService.ConvertToStringArr(game.Puzzle.Grid)
+                    ,ListOfWords = game.Puzzle.ListOfWords
+                }
 
             };
             // send the group message that the room is filled  

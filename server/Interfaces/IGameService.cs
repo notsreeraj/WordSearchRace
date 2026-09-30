@@ -11,7 +11,7 @@ namespace server.Interfaces
     {
          
 
-         Game CreateNewGame(string playerID);
+         Game CreateNewGame(string playerID , int size);
 
 
          Game InitiateGame(string gameId, int size );
