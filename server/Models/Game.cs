@@ -18,6 +18,7 @@ namespace server.Models
         {
             playerId
         };
+        public int? PlayersReady {get;set;} = 0;
         public Puzzle? Puzzle { get; set; }
 
     }

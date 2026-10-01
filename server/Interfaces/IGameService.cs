@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using server.DTOs;
 using server.Models;
 
 namespace server.Interfaces
@@ -18,5 +19,8 @@ namespace server.Interfaces
          Game JoinGame(string gamedID , string newPlayeID);
          bool IsMaxNumPlayer(string gameID);
 
+        bool AreBothPlayerReady(string gameId);
+        void UpdateNumPlayersReady(string gameId);
+        GameDTO ConvertGameToDto(string  gameId);
     }
 }

@@ -15,10 +15,10 @@ namespace server.DTOs
     }
         public class InitiateGameDTO
     {
-        public string? GameId { get; set; }
-        public int Size { get; set; }
+        public required string GameId { get; set; }
+        public required string PlayerID { get; set; }
 
-        public bool PlayersReady { get; set; }
+        public required bool PlayersReady { get; set; }
     }
 
     public class JoinGameDTO

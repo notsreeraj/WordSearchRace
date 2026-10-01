@@ -5,6 +5,8 @@ const SignalRTestScreen = () => {
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
   const [gameId, setGameId] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
+  const [size, setSize] = useState(15);
+  const [joined , setJoined] = useState(false);
 
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
@@ -17,13 +19,19 @@ const SignalRTestScreen = () => {
         console.log("Connected to hub");
 
         newConnection.on("GameCreatedAndWaitingForPlayer", (id: string) => {
+          setJoined(true);
           setGameId(id); // auto fill the gameId field
           setMessages((prev) => [...prev, `GameCreatedAndWaitingForPlayer: ${id}`]);
         });
 
-        newConnection.on("RoomReady", (gameDto: any) => {
-          setMessages((prev) => [...prev, `RoomReady: ${JSON.stringify(gameDto)}`]);
+        newConnection.on("RoomReady", (message : any) => {
+          setJoined(true);
+          setMessages((prev) => [...prev, `RoomReady: message`]);
         });
+
+        newConnection.on("BothPlayersReady",(gameDto : any)=>{
+          setMessages((prev)=>[...prev,`BothPlayerReady: ${JSON.stringify(gameDto)}`])
+        } )
 
       })
       .catch((err) => console.error("Connection failed: ", err));
@@ -39,7 +47,7 @@ const SignalRTestScreen = () => {
     if (connection) {
       await connection.invoke("CreateGame", {
         playerID: "FirstPlayer",
-        size : 20
+        size
       });
     }
   };
@@ -53,6 +61,18 @@ const SignalRTestScreen = () => {
     }
   };
 
+const ReadyGame = async () => {
+  if(connection && joined){
+    // invoke the readgame method
+    await connection.invoke("ReadyGame",{
+      gameId : gameId,
+      playerId : "NOtConsiderd",
+      playersReady : true
+
+    })
+  }
+}
+
   return (
     <div>
       <h2>SignalR Hub Test</h2>
@@ -60,6 +80,18 @@ const SignalRTestScreen = () => {
       <div>
         <button onClick={createGame}>Create Game</button>
       </div>
+
+      <select value={size} onChange={(e) => setSize(Number(e.target.value))}>
+    {Array.from({ length: 11 }, (_, index) => {
+      const value = index + 15;
+      return (
+        <option key={value} value={value}>
+          {value}
+        </option>
+      );
+    })}
+  </select>
+
 
       <div style={{ marginTop: "1rem" }}>
         <input
@@ -69,6 +101,19 @@ const SignalRTestScreen = () => {
           onChange={(e) => setGameId(e.target.value)}
         />
         <button onClick={joinGame}>Join Game</button>
+
+        <button
+        onClick={ReadyGame}
+          disabled={!joined}
+          style={{
+            marginLeft: "0.5rem",
+            backgroundColor: joined ? "green" : "gray",
+            color: "white",
+            cursor: joined ? "pointer" : "not-allowed",
+          }}
+          >
+        Ready
+      </button>
       </div>
 
       <div style={{ marginTop: "1rem" }}>

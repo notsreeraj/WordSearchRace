@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing.Tree;
 using server.Interfaces;
 using server.Models;
 using Microsoft.Extensions.Logging;
+using server.DTOs;
 
 namespace server.Services
 {
@@ -32,7 +33,7 @@ namespace server.Services
              newGame.Puzzle =  _puzzleService.GeneratePuzzle(size);
 
              
-             //newGame.Players.Add(playerID);
+             
 
              _games.TryAdd( newGame.Id,newGame);
 
@@ -93,6 +94,26 @@ namespace server.Services
             return currentGame;
         }
 
+        // method to convet game model to gamedto
+
+        public GameDTO ConvertGameToDto(string gameId)
+        {
+             var game = FindGameID(gameId);
+             if(game == null) throw new ArgumentException("Game not found");
+
+            GameDTO gameDto = new GameDTO
+            {
+                Id = game.Id,
+                Players = game.Players,
+                Puzzledto = new PuzzleDto
+                {
+                    GridSingleD = _puzzleService.ConvertToStringArr(game.Puzzle.Grid)
+                    ,ListOfWords = game.Puzzle.ListOfWords 
+                }
+
+            };
+            return gameDto;
+        }
 
 
         #region Helper Methods
@@ -123,6 +144,29 @@ namespace server.Services
             return game.Players.Count == 2;
         }
 
+
+        // method to increment the number of players that are ready in a game
+        public void UpdateNumPlayersReady( string gameId)
+        {
+            // get the game 
+            // increment its number
+            var game = FindGameID(gameId);
+            if(game == null) throw new Exception("Game Not Found");
+
+            game.PlayersReady ++;
+            _games[gameId] = game;
+             
+        }
+
+        // method to check if both players are ready for a game
+
+        public bool AreBothPlayerReady(string gameId)
+        {
+            var game = FindGameID(gameId);
+            if(game == null) throw new Exception("Game Not Found");
+
+            return game.PlayersReady == 2;
+        }
 
         #endregion
 
