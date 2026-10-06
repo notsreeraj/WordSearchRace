@@ -64,6 +64,13 @@ namespace server.Hubs
             // else send message to the both player with both players are ready
             
         }
+
+        public async Task SubmitWord (SubmitWordDto submitWordDto)
+        {
+            // call the gameserivice ValidateSelectionMetho(pass in the list of cell from the dto)
+            // if the result is true send the caller 1 point
+            // if not send the caller 0 point
+        }
         
     }
 }

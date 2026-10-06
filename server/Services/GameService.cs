@@ -22,6 +22,11 @@ namespace server.Services
         #endregion
 
 
+        #region Inherited Methods
+
+
+        #endregion
+
         /// <summary>
         /// method to create a new game instance
         /// </summary>
@@ -115,6 +120,36 @@ namespace server.Services
             return gameDto;
         }
 
+        /// <summary>
+        /// bridges gameservice and puzzle serice to validate selection 
+        /// </summary>
+        /// <param name="userSelection"> List of cells </param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public bool ValidateSelectionMethod(List<Cell> userSelection , string gameID)
+        {
+            // make a string from the list of cells 
+            string selectedWord ="";
+            foreach(Cell c in userSelection)
+            {
+                selectedWord = selectedWord + c.letter;
+            }
+
+            var game = FindGameID(gameID);
+
+            List<string> wordList = game.Puzzle.ListOfWords;
+
+            // call Validateword from puzzelservice and pass the string to the method
+            // also get the list of word from the game id  
+            // find the game 
+            
+            var result = _puzzleService.Validateword(wordList,selectedWord);
+            // return its value
+
+            return result;
+        }
+
+
 
         #region Helper Methods
 
@@ -167,6 +202,7 @@ namespace server.Services
 
             return game.PlayersReady == 2;
         }
+
 
         #endregion
 

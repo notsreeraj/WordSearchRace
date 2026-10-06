@@ -23,24 +23,9 @@ namespace server.Services
 
         };
 
-         static void PrintGrid(char[,] Grid)
-        {
-            Console.WriteLine(" ******Printing grid");
-            for (int i = 0; i < Grid.GetLength(0); i++)
-            {
-            Console.WriteLine();
+        #region InterfaceMethods
 
-                for (int j = 0; j < Grid.GetLength(0); j++)
-                {
-                    if (Grid[i, j] == '\0') Console.Write('*');
-                    else  Console.Write(Grid[i, j]);
-                }
-            }
-            Console.WriteLine();
-        }
-
-   
-    /// <summary>
+            /// <summary>
     ///  the main method to generate a puzzle based on  size and list of choice
     /// </summary>
     /// <param name="size"></param>
@@ -80,20 +65,96 @@ namespace server.Services
             
         };
         PrintGrid(newGrid);
-            
-
-            
-        
-
-
         return NewPuzzle;
 
+        }
 
+        /// <summary>
+        /// this method converts char[,] to string[] to make json friendlu
+        /// </summary>
+        /// <param name="grid">grid reference</param>
+        /// <returns></returns>
+        public string[] ConvertToStringArr(char [,] grid)      
+        {
             
 
-            
+             var rows = Enumerable.Range(0, grid.GetLength(0))
+            .Select(row => new string(Enumerable.Range(0, grid.GetLength(1))
+                .Select(col => grid[row, col] == '\0' ? '*' : grid[row, col])
+                .ToArray()))
+            .ToArray();
+
+        return rows;
 
         }
+
+        /// <summary>
+        /// this method converts string[] to char[,]
+        /// </summary>
+        /// <param name="rows">string [] referenc from dto</param>
+        /// <returns></returns>
+        public char[,] ConvertToGrid(string[] rows)
+        {
+            if (rows == null || rows.Length == 0)
+            {
+                throw new NullReferenceException("Given String [] is empty");
+            }
+
+            int rowCount = rows.Length;
+            int colCount = rows[0].Length;
+
+            char[,] grid = new char[rowCount, colCount];
+
+            for (int r = 0; r < rowCount; r++)
+            {
+                // Optional: Handles variable-length strings safely
+                int length = Math.Min(rows[r].Length, colCount);
+
+                for (int c = 0; c < length; c++)
+                {
+                    // Replaces asterisks back to null chars if needed
+                    char currentChar = rows[r][c];
+                    grid[r, c] = currentChar == '*' ? '\0' : currentChar;
+                }
+            }
+
+            return grid;
+        }
+
+        public bool Validateword(List<string> words, string selectedWord)
+        {
+            // Instantiate a hashset using the list of words , 
+            HashSet<string> wordsSet = new(words);
+            return wordsSet.Contains(selectedWord);
+            // look up the selected word if found return tru 
+            
+        }
+ 
+
+
+        #endregion
+
+
+            #region HELPER METHODS
+
+         static void PrintGrid(char[,] Grid)
+        {
+            Console.WriteLine(" ******Printing grid");
+            for (int i = 0; i < Grid.GetLength(0); i++)
+            {
+            Console.WriteLine();
+
+                for (int j = 0; j < Grid.GetLength(0); j++)
+                {
+                    if (Grid[i, j] == '\0') Console.Write('*');
+                    else  Console.Write(Grid[i, j]);
+                }
+            }
+            Console.WriteLine();
+        }
+
+   
+
 
         /// <summary>
         /// method to find the best cell + direction among the grid 
@@ -356,60 +417,7 @@ namespace server.Services
 
         }
 
-
-
-        /// <summary>
-        /// this method converts char[,] to string[] to make json friendlu
-        /// </summary>
-        /// <param name="grid">grid reference</param>
-        /// <returns></returns>
-        public string[] ConvertToStringArr(char [,] grid)      
-        {
-            
-
-             var rows = Enumerable.Range(0, grid.GetLength(0))
-            .Select(row => new string(Enumerable.Range(0, grid.GetLength(1))
-                .Select(col => grid[row, col] == '\0' ? '*' : grid[row, col])
-                .ToArray()))
-            .ToArray();
-
-        return rows;
-
-        }
-
-        /// <summary>
-        /// this method converts string[] to char[,]
-        /// </summary>
-        /// <param name="rows">string [] referenc from dto</param>
-        /// <returns></returns>
-        public char[,] ConvertToGrid(string[] rows)
-        {
-            if (rows == null || rows.Length == 0)
-            {
-                throw new NullReferenceException("Given String [] is empty");
-            }
-
-            int rowCount = rows.Length;
-            int colCount = rows[0].Length;
-
-            char[,] grid = new char[rowCount, colCount];
-
-            for (int r = 0; r < rowCount; r++)
-            {
-                // Optional: Handles variable-length strings safely
-                int length = Math.Min(rows[r].Length, colCount);
-
-                for (int c = 0; c < length; c++)
-                {
-                    // Replaces asterisks back to null chars if needed
-                    char currentChar = rows[r][c];
-                    grid[r, c] = currentChar == '*' ? '\0' : currentChar;
-                }
-            }
-
-            return grid;
-        }
-
+    #endregion
 
     }
 }

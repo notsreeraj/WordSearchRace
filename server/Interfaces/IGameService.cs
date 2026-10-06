@@ -22,5 +22,7 @@ namespace server.Interfaces
         bool AreBothPlayerReady(string gameId);
         void UpdateNumPlayersReady(string gameId);
         GameDTO ConvertGameToDto(string  gameId);
+
+        bool ValidateSelectionMethod(List<Cell> userSelection , string gamedID);
     }
 }

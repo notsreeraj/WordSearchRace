@@ -13,5 +13,6 @@ namespace server.Interfaces
            Puzzle GeneratePuzzle(int size);
             char[,] ConvertToGrid(string[] rows);
             string[] ConvertToStringArr(char [,] grid);
+            bool Validateword(List<string> words , string selectedWord); 
     }
 }
