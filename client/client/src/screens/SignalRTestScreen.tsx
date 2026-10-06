@@ -46,19 +46,25 @@ const SignalRTestScreen = () => {
           setMessages((prev) => [...prev, `GameCreated: ${id}`]);
         });
 
-        newConnection.on("RoomReady", () => {
+        newConnection.on("RoomReady", (message : string) => {
           setJoined(true);
-          setMessages((prev) => [...prev, `RoomReady: both players in room`]);
-        });
+          setMessages((prev) => [...prev, message]);
+        }); 
 
         newConnection.on("BothPlayersReady", (dto: GameDTO) => {
           setGameDto(dto);
           setMessages((prev) => [...prev, `BothPlayersReady: game starting`]);
         });
-        newConnection.on("WaitingSecPlayerToReady",() =>{
+        newConnection.on("WaitingSecPlayerToReady",(message : string) =>{
           setMessages((prev)=>
-            [...prev, `waiting for players to be ready`]
+            [...prev, message]
           );
+        });
+        newConnection.on("ValidSelection" ,(message : string) =>{
+          setMessages((prev)=>[...prev, message])
+        });
+        newConnection.on("InvalidSelection" ,(message : string) =>{
+          setMessages((prev)=>[...prev, message])
         });
 
       })
@@ -127,6 +133,8 @@ const SignalRTestScreen = () => {
   const handleMouseUp = () => {
     setIsDragging(false);
     if (isInvalid) setSelectedCells([]);
+    // lets call the submit word method here instead of the submit button
+    SubmitWord()
   };
 
   const isSelected = (row: number, col: number) =>
@@ -153,6 +161,16 @@ const SignalRTestScreen = () => {
       });
     }
   };
+
+  const SubmitWord = async ()=>{
+    if(connection && gameId){
+      await connection.invoke("SubmitWord",{
+        // submit word dto
+        gameId,
+        ClientSelection : selectedCells
+      })
+    }
+  }
 
   const renderGrid = () => {
     if (!gameDto?.puzzledto?.gridSingleD) return null;
@@ -198,6 +216,20 @@ const SignalRTestScreen = () => {
         {/* coordinate display */}
         <div style={{ marginTop: "1rem" }}>
           <strong>Selected word:</strong> {selectedCells.map((c) => c.letter).join("") || "—"}
+          <button
+          onClick={SubmitWord}
+          disabled={selectedCells.length === 0}
+          style={{
+            marginLeft: "1rem",
+            backgroundColor: selectedCells.length > 0 ? "#4F46E5" : "gray",
+            color: "white",
+            padding: "4px 12px",
+            borderRadius: "4px",
+            cursor: selectedCells.length > 0 ? "pointer" : "not-allowed",
+          }}
+        >
+          Submit
+        </button>
         </div>
         <textarea
           readOnly
@@ -207,7 +239,10 @@ const SignalRTestScreen = () => {
             .map((c) => `row=${c.row}, col=${c.col}, letter=${c.letter}`)
             .join("\n")}
         />
-
+         <div style={{ marginTop: "1rem" }}>
+            <h3>Messages:</h3>
+            {messages.map((msg, index) => <p key={index}>{msg}</p>)}
+          </div>
         <div style={{ marginTop: "1rem" }}>
           <h3>Words to find:</h3>
           <ul>

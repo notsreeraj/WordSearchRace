@@ -126,7 +126,7 @@ namespace server.Services
         /// <param name="userSelection"> List of cells </param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public bool ValidateSelectionMethod(List<Cell> userSelection , string gameID)
+        public bool ValidateSelection(List<Cell> userSelection , string gameID)
         {
             // make a string from the list of cells 
             string selectedWord ="";
@@ -136,7 +136,7 @@ namespace server.Services
             }
 
             var game = FindGameID(gameID);
-
+ 
             List<string> wordList = game.Puzzle.ListOfWords;
 
             // call Validateword from puzzelservice and pass the string to the method

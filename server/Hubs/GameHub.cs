@@ -70,6 +70,20 @@ namespace server.Hubs
             // call the gameserivice ValidateSelectionMetho(pass in the list of cell from the dto)
             // if the result is true send the caller 1 point
             // if not send the caller 0 point
+            var result = _gameService.ValidateSelection(submitWordDto.ClientSelection,submitWordDto.gameId);
+            // if result is true
+            if (result)
+            {
+                await Clients.Caller.SendAsync("ValidSelection","Your selection is valid");
+                // we should also brodcast the progress for every client
+            }
+            else
+            {
+                // let the caller know the seleciotn is not valid
+                await Clients.Caller.SendAsync("InvalidSelection","Your selection is not valid");
+            }
+
+            // if result is not true
         }
         
     }
