@@ -189,6 +189,7 @@ const SignalRTestScreen = () => {
     const grid = gameDto.puzzledto.gridSingleD;
 
     return (
+      
       <div style={{ userSelect: "none" }}>
         <table style={{ borderCollapse: "collapse", marginTop: "1rem" }}>
           <tbody>
@@ -226,7 +227,7 @@ const SignalRTestScreen = () => {
         </table>
 
         {/* coordinate display */}
-        <div style={{ marginTop: "1rem" }}>
+        {/* <div style={{ marginTop: "1rem" }}>
           <strong>Selected word:</strong> {selectedCells.map((c) => c.letter).join("") || "—"}
           <button
           onClick={SubmitWord}
@@ -242,7 +243,43 @@ const SignalRTestScreen = () => {
         >
           Submit
         </button>
+        </div> */}
+        {/* Progress Bars */}
+{playersProgress && gameDto?.puzzledto && (
+  <div style={{ marginTop: "1rem" }}>
+    <h3>Progress</h3>
+    {Object.entries(playersProgress).map(([playerId, count]) => {
+      const total = gameDto.puzzledto!.listOfWords.length;
+      const percentage = Math.round((count / total) * 100);
+
+      return (
+        <div key={playerId} style={{ marginBottom: "0.75rem" }}>
+          <div style={{ fontSize: "13px", marginBottom: "4px" }}>
+            {playerId}: {count} / {total} words
+          </div>
+          <div style={{
+            width: "100%",
+            height: "20px",
+            background: "#E5E7EB",
+            borderRadius: "10px",
+            overflow: "hidden"
+          }}>
+            <div style={{
+              width: `${percentage}%`,
+              height: "100%",
+              background: "#4F46E5",
+              borderRadius: "10px",
+              transition: "width 0.3s ease"
+            }} />
+          </div>
+          <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "2px" }}>
+            {percentage}%
+          </div>
         </div>
+      );
+    })}
+  </div>
+)}
         <textarea
           readOnly
           rows={5}
