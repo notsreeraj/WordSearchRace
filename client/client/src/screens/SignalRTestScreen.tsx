@@ -73,6 +73,11 @@ const SignalRTestScreen = () => {
           setPlayersProgress(newPlayersProgress);
           console.log(playersProgress);
         })
+        newConnection.on("RaceEnded",(winner : string)=>{
+          // usestate winner , if the winner is set the game ends
+          setMessages((prev) =>[...prev,winner +" has won the race"])
+
+        });
 
 
       })

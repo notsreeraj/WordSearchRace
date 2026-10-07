@@ -80,8 +80,12 @@ namespace server.Hubs
 
                 var playersProgress =  _gameService.UpdatePlayerProgress(submitWordDto.PlayerId,submitWordDto.gameId);
                 await Clients.Group(submitWordDto.gameId).SendAsync( "UpdatedPlayersProgress" ,playersProgress);
-                // check if a player has completed the progress 
-                    // if yes brodcast the race result  
+
+                // if a playerhas won lets broadcast the message
+                if (_gameService.HasPlayerWon(submitWordDto.PlayerId, submitWordDto.gameId))
+                {
+                    await Clients.Group(submitWordDto.gameId).SendAsync("RaceEnded",submitWordDto.PlayerId);
+                }
                 
             }
             else

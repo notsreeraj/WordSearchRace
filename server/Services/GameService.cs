@@ -150,6 +150,44 @@ namespace server.Services
 
             return result;
         }
+        // method to update a player progress
+        public Dictionary<string,int> UpdatePlayerProgress( string playerID, string gameId)
+        {
+            // get the game reference
+            var game = FindGameID(gameId);
+            if(game == null) throw new Exception("Game Not Found");
+
+
+            // update the value in dictionary by key
+            game.PlayersProgress[playerID] ++;
+            _games[gameId]= game;
+            return game.PlayersProgress;
+            // and also update the game
+        }
+
+        /// <summary>
+        /// method to see if a player has won by id
+        /// </summary>
+        /// <param name="playrId"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public bool HasPlayerWon(string playerId, string gameId)
+        {
+            // get the game reference
+            var game = FindGameID(gameId);
+            if(game == null) throw new Exception("Game Not Found");
+
+            // find the progress of the player and see if the value is same as the count of words
+            var prog = game.PlayersProgress[playerId];
+            var maxProg = game.Puzzle.ListOfWords.Count;
+
+            if(prog == maxProg)
+            {
+                return true;
+            }
+
+            return false;            
+        }
 
 
 
@@ -205,20 +243,8 @@ namespace server.Services
             return game.PlayersReady == 2;
         }
 
-        // method to update a player progress
-        public Dictionary<string,int> UpdatePlayerProgress( string playerID, string gameId)
-        {
-            // get the game reference
-            var game = FindGameID(gameId);
-            if(game == null) throw new Exception("Game Not Found");
+        
 
-
-            // update the value in dictionary by key
-            game.PlayersProgress[playerID] ++;
-            _games[gameId]= game;
-            return game.PlayersProgress;
-            // and also update the game
-        }
 
         #endregion
 
