@@ -18,6 +18,8 @@ namespace server.DTOs
 
     public class SubmitWordDto
     {
+        public required string PlayerId { get; set; }
+
         //game id this is use to identify the game to get the puzzle
         public required string gameId { get; set; }
         // list of cell

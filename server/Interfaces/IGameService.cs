@@ -24,5 +24,6 @@ namespace server.Interfaces
         GameDTO ConvertGameToDto(string  gameId);
 
         bool ValidateSelection(List<Cell> userSelection , string gamedID);
+        Dictionary<string,int> UpdatePlayerProgress(string playerID, string gamedId);
     }
 }

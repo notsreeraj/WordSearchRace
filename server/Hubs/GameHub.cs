@@ -38,7 +38,7 @@ namespace server.Hubs
 
            // GameDTO gameDto = _gameService.ConvertGameToDto(game);
             // send the group message that the room is filled  
-            await Clients.Group(game.Id).SendAsync("RoomReady", "Click Ready to Start Game..." );
+            await Clients.Group(game.Id).SendAsync("GameJoined", "Click Ready to Start Game..." );
 
         }
 
@@ -70,12 +70,19 @@ namespace server.Hubs
             // call the gameserivice ValidateSelectionMetho(pass in the list of cell from the dto)
             // if the result is true send the caller 1 point
             // if not send the caller 0 point
+            // if the result is true , we should also check if a player has completed the list of words, maybe see if the player progress int is same as the count of the list of words
             var result = _gameService.ValidateSelection(submitWordDto.ClientSelection,submitWordDto.gameId);
             // if result is true
             if (result)
             {
                 await Clients.Caller.SendAsync("ValidSelection","Your selection is valid");
-                // we should also brodcast the progress for every client
+                // send the the player progress dictionary to the caller or the group
+
+                var playersProgress =  _gameService.UpdatePlayerProgress(submitWordDto.PlayerId,submitWordDto.gameId);
+                await Clients.Group(submitWordDto.gameId).SendAsync( "UpdatedPlayersProgress" ,playersProgress);
+                // check if a player has completed the progress 
+                    // if yes brodcast the race result  
+                
             }
             else
             {

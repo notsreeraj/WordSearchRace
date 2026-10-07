@@ -95,7 +95,8 @@ namespace server.Services
             if(currentGame.Players.Count == 2 ) throw new Exception("Reached Maximum amount of players in Game"); 
             
             // use the currentGame and add the new player to the playeslist
-            currentGame.Players.Add(newPlayerID);                 
+            currentGame.Players.Add(newPlayerID);
+            currentGame.PlayersProgress.Add(newPlayerID,0);                 
             return currentGame;
         }
 
@@ -144,6 +145,7 @@ namespace server.Services
             // find the game 
             
             var result = _puzzleService.Validateword(wordList,selectedWord);
+
             // return its value
 
             return result;
@@ -203,6 +205,20 @@ namespace server.Services
             return game.PlayersReady == 2;
         }
 
+        // method to update a player progress
+        public Dictionary<string,int> UpdatePlayerProgress( string playerID, string gameId)
+        {
+            // get the game reference
+            var game = FindGameID(gameId);
+            if(game == null) throw new Exception("Game Not Found");
+
+
+            // update the value in dictionary by key
+            game.PlayersProgress[playerID] ++;
+            _games[gameId]= game;
+            return game.PlayersProgress;
+            // and also update the game
+        }
 
         #endregion
 

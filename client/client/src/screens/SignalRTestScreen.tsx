@@ -29,6 +29,9 @@ const SignalRTestScreen = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startCell, setStartCell] = useState<Cell | null>(null);
   const [isInvalid, setIsInvalid] = useState(false);
+  const [playerId,setPlayerID] = useState("");
+  const [playersProgress, setPlayersProgress] = useState<Record<string, number> | null>(null);
+
 
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
@@ -46,7 +49,7 @@ const SignalRTestScreen = () => {
           setMessages((prev) => [...prev, `GameCreated: ${id}`]);
         });
 
-        newConnection.on("RoomReady", (message : string) => {
+        newConnection.on("GameJoined", (message : string) => {
           setJoined(true);
           setMessages((prev) => [...prev, message]);
         }); 
@@ -66,6 +69,11 @@ const SignalRTestScreen = () => {
         newConnection.on("InvalidSelection" ,(message : string) =>{
           setMessages((prev)=>[...prev, message])
         });
+        newConnection.on("UpdatedPlayersProgress" ,(newPlayersProgress : Record<string, number>)=>{
+          setPlayersProgress(newPlayersProgress);
+          console.log(playersProgress);
+        })
+
 
       })
       .catch((err) => console.error("Connection failed: ", err));
@@ -142,13 +150,16 @@ const SignalRTestScreen = () => {
 
   const createGame = async () => {
     if (connection) {
+      // set player id 
+      setPlayerID("FirstPlayer");
       await connection.invoke("CreateGame", { playerID: "FirstPlayer", size });
     }
   };
 
   const joinGame = async () => {
     if (connection && gameId) {
-      await connection.invoke("JoinGame", { gameID: gameId, playerID: "secondplayer" });
+      setPlayerID("Secondplayer");
+      await connection.invoke("JoinGame", { gameID: gameId, playerID: "Secondplayer" });
     }
   };
 
@@ -166,6 +177,7 @@ const SignalRTestScreen = () => {
     if(connection && gameId){
       await connection.invoke("SubmitWord",{
         // submit word dto
+        playerId,
         gameId,
         ClientSelection : selectedCells
       })

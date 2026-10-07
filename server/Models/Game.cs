@@ -21,5 +21,10 @@ namespace server.Models
         public int? PlayersReady {get;set;} = 0;
         public Puzzle? Puzzle { get; set; }
 
+        public Dictionary<string, int>? PlayersProgress { get; set; } = new()
+        {
+            [playerId] = 0   
+        };
+
     }
 }
