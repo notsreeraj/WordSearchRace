@@ -71,7 +71,7 @@ namespace server.Hubs
             // if the result is true send the caller 1 point
             // if not send the caller 0 point
             // if the result is true , we should also check if a player has completed the list of words, maybe see if the player progress int is same as the count of the list of words
-            var result = _gameService.ValidateSelection(submitWordDto.ClientSelection,submitWordDto.gameId);
+            var result = _gameService.ValidateSelection(submitWordDto.ClientSelection,submitWordDto.gameId , submitWordDto.PlayerId);
             // if result is true
             if (result)
             {

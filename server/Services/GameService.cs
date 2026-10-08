@@ -96,11 +96,21 @@ namespace server.Services
             
             // use the currentGame and add the new player to the playeslist
             currentGame.Players.Add(newPlayerID);
-            currentGame.PlayersProgress.Add(newPlayerID,0);                 
+            currentGame.PlayersProgress.Add(newPlayerID,0);
+            currentGame.WordsPerPlayer.Add(newPlayerID, new List<string>());
+
+            // update the game with new property
+            _games[gameID] = currentGame;
+                             
             return currentGame;
         }
 
-        // method to convet game model to gamedto
+        /// <summary>
+        /// method to convet game model to gamedto
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
 
         public GameDTO ConvertGameToDto(string gameId)
         {
@@ -127,7 +137,7 @@ namespace server.Services
         /// <param name="userSelection"> List of cells </param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public bool ValidateSelection(List<Cell> userSelection , string gameID)
+        public bool ValidateSelection(List<Cell> userSelection , string gameID , string playerId)
         {
             // make a string from the list of cells 
             string selectedWord ="";
@@ -146,6 +156,12 @@ namespace server.Services
             
             var result = _puzzleService.Validateword(wordList,selectedWord);
 
+            if (result)
+            {
+                // add the word to the wordsperPlayer dicionary
+                game.WordsPerPlayer[playerId].Add(selectedWord);
+                _games[gameID] = game;
+            }
             // return its value
 
             return result;

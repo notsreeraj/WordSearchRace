@@ -26,5 +26,10 @@ namespace server.Models
             [playerId] = 0   
         };
 
+        public Dictionary<string , List<string>>? WordsPerPlayer { get; set; }  = new(){
+            // add the first player to the list
+            [playerId] = new List<string>()
+        };
+
     }
 }

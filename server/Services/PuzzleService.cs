@@ -61,6 +61,7 @@ namespace server.Services
         var NewPuzzle = new Puzzle
         {
           Grid = newGrid,
+          
           ListOfWords = words
             
         };
