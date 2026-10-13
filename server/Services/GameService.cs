@@ -166,6 +166,18 @@ namespace server.Services
 
             return result;
         }
+        // method to get updatedWordsperPlayr 
+        public Dictionary<string , List<string>> GetWordsPlayer( string gameId )
+        {
+           var game = FindGameID(gameId);
+            if(game == null) throw new Exception("Game Not Found");
+
+            var result = game.WordsPerPlayer;
+
+            return result;
+        }
+
+
         // method to update a player progress
         public Dictionary<string,int> UpdatePlayerProgress( string playerID, string gameId)
         {
@@ -177,6 +189,10 @@ namespace server.Services
             // update the value in dictionary by key
             game.PlayersProgress[playerID] ++;
             _games[gameId]= game;
+
+
+            //alright let us also add the found word to the wordperplayer list
+           // game.WordsPerPlayer[playerID].Add()
             return game.PlayersProgress;
             // and also update the game
         }
@@ -211,6 +227,7 @@ namespace server.Services
 
         /// <summary>
         /// finds a game with id
+        /// Wille return the reference of the game in memoery
         /// returns null if not found
         /// here i wrote game? becaue this method may return null
         /// </summary>

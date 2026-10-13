@@ -26,5 +26,6 @@ namespace server.Interfaces
         bool ValidateSelection(List<Cell> userSelection , string gamedID , string playerId);
         Dictionary<string,int> UpdatePlayerProgress(string playerID, string gamedId);
         bool HasPlayerWon(string playerId, string gameId);
+        Dictionary<string , List<string>> GetWordsPlayer(string playerId);
     }
 }

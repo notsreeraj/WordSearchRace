@@ -252,7 +252,7 @@ namespace server.Services
 
 
                 // Only consider this direction if it's at least as good as current best
-                if (newScore >= curScore)
+                if (newScore >= curScore && newScore > 0)
                 {
 
 
@@ -342,7 +342,7 @@ namespace server.Services
 
                 }
             }
-            else return -1;
+            else return 0;
                 return score;
         }
 

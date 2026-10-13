@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import * as signalR from "@microsoft/signalr";
 
 interface PuzzleDto {
@@ -29,9 +29,8 @@ const SignalRTestScreen = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startCell, setStartCell] = useState<Cell | null>(null);
   const [isInvalid, setIsInvalid] = useState(false);
-  const [playerId,setPlayerID] = useState("");
-  const [playersProgress, setPlayersProgress] = useState<Record<string, number> | null>(null);
-
+  const [playerId, setPlayerID] = useState("");
+  const [wordsPerPlayer, setWordsPerPlayer] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
@@ -49,37 +48,35 @@ const SignalRTestScreen = () => {
           setMessages((prev) => [...prev, `GameCreated: ${id}`]);
         });
 
-        newConnection.on("GameJoined", (message : string) => {
+        newConnection.on("GameJoined", (message: string) => {
           setJoined(true);
           setMessages((prev) => [...prev, message]);
-        }); 
+        });
 
         newConnection.on("BothPlayersReady", (dto: GameDTO) => {
           setGameDto(dto);
           setMessages((prev) => [...prev, `BothPlayersReady: game starting`]);
         });
-        newConnection.on("WaitingSecPlayerToReady",(message : string) =>{
-          setMessages((prev)=>
-            [...prev, message]
-          );
-        });
-        newConnection.on("ValidSelection" ,(message : string) =>{
-          setMessages((prev)=>[...prev, message])
-        });
-        newConnection.on("InvalidSelection" ,(message : string) =>{
-          setMessages((prev)=>[...prev, message])
-        });
-        newConnection.on("UpdatedPlayersProgress" ,(newPlayersProgress : Record<string, number>)=>{
-          setPlayersProgress(newPlayersProgress);
-          console.log(playersProgress);
-        })
-        newConnection.on("RaceEnded",(winner : string)=>{
-          // usestate winner , if the winner is set the game ends
-          setMessages((prev) =>[...prev,winner +" has won the race"])
 
+        newConnection.on("WaitingSecPlayerToReady", (message: string) => {
+          setMessages((prev) => [...prev, message]);
         });
 
+        newConnection.on("ValidSelection", (message: string) => {
+          setMessages((prev) => [...prev, message]);
+        });
 
+        newConnection.on("InvalidSelection", (message: string) => {
+          setMessages((prev) => [...prev, message]);
+        });
+
+        newConnection.on("RaceEnded", (winner: string) => {
+          setMessages((prev) => [...prev, winner + " has won the race"]);
+        });
+
+        newConnection.on("NewFoundWords", (data: Record<string, string[]>) => {
+          setWordsPerPlayer(data);
+        });
       })
       .catch((err) => console.error("Connection failed: ", err));
 
@@ -88,7 +85,6 @@ const SignalRTestScreen = () => {
     return () => { newConnection.stop(); };
   }, []);
 
-  // stop drag if mouse released outside the grid
   useEffect(() => {
     const handleMouseUp = () => setIsDragging(false);
     window.addEventListener("mouseup", handleMouseUp);
@@ -145,9 +141,11 @@ const SignalRTestScreen = () => {
 
   const handleMouseUp = () => {
     setIsDragging(false);
-    if (isInvalid) setSelectedCells([]);
-    // lets call the submit word method here instead of the submit button
-    SubmitWord()
+    if (isInvalid) {
+      setSelectedCells([]);
+    } else {
+      SubmitWord();
+    }
   };
 
   const isSelected = (row: number, col: number) =>
@@ -155,7 +153,6 @@ const SignalRTestScreen = () => {
 
   const createGame = async () => {
     if (connection) {
-      // set player id 
       setPlayerID("FirstPlayer");
       await connection.invoke("CreateGame", { playerID: "FirstPlayer", size });
     }
@@ -178,23 +175,22 @@ const SignalRTestScreen = () => {
     }
   };
 
-  const SubmitWord = async ()=>{
-    if(connection && gameId){
-      await connection.invoke("SubmitWord",{
-        // submit word dto
+  const SubmitWord = async () => {
+    if (connection && gameId && selectedCells.length > 0) {
+      await connection.invoke("SubmitWord", {
         playerId,
         gameId,
-        ClientSelection : selectedCells
-      })
+        ClientSelection: selectedCells,
+      });
+      setSelectedCells([]);
     }
-  }
+  };
 
   const renderGrid = () => {
     if (!gameDto?.puzzledto?.gridSingleD) return null;
     const grid = gameDto.puzzledto.gridSingleD;
 
     return (
-      
       <div style={{ userSelect: "none" }}>
         <table style={{ borderCollapse: "collapse", marginTop: "1rem" }}>
           <tbody>
@@ -217,7 +213,9 @@ const SignalRTestScreen = () => {
                           : isSelected(rowIndex, colIndex)
                           ? "#4F46E5"
                           : "#F3F4F6",
-                        color: isSelected(rowIndex, colIndex) ? (isInvalid ? "#991B1B" : "white") : "black",
+                        color: isSelected(rowIndex, colIndex)
+                          ? isInvalid ? "#991B1B" : "white"
+                          : "black",
                         border: "1px solid #D1D5DB",
                         borderRadius: "4px",
                       }}
@@ -231,60 +229,36 @@ const SignalRTestScreen = () => {
           </tbody>
         </table>
 
-        {/* coordinate display */}
-        {/* <div style={{ marginTop: "1rem" }}>
-          <strong>Selected word:</strong> {selectedCells.map((c) => c.letter).join("") || "—"}
-          <button
-          onClick={SubmitWord}
-          disabled={selectedCells.length === 0}
-          style={{
-            marginLeft: "1rem",
-            backgroundColor: selectedCells.length > 0 ? "#4F46E5" : "gray",
-            color: "white",
-            padding: "4px 12px",
-            borderRadius: "4px",
-            cursor: selectedCells.length > 0 ? "pointer" : "not-allowed",
-          }}
-        >
-          Submit
-        </button>
-        </div> */}
         {/* Progress Bars */}
-{playersProgress && gameDto?.puzzledto && (
-  <div style={{ marginTop: "1rem" }}>
-    <h3>Progress</h3>
-    {Object.entries(playersProgress).map(([playerId, count]) => {
-      const total = gameDto.puzzledto!.listOfWords.length;
-      const percentage = Math.round((count / total) * 100);
+        {Object.keys(wordsPerPlayer).length > 0 && gameDto?.puzzledto && (
+          <div style={{ marginTop: "1rem" }}>
+            <h3>Progress</h3>
+            {Object.entries(wordsPerPlayer).map(([pid, foundWords]) => {
+              const total = gameDto?.puzzledto?.listOfWords.length ?? 1;
+              const percentage = Math.round((foundWords.length / total) * 100);
 
-      return (
-        <div key={playerId} style={{ marginBottom: "0.75rem" }}>
-          <div style={{ fontSize: "13px", marginBottom: "4px" }}>
-            {playerId}: {count} / {total} words
+              return (
+                <div key={pid} style={{ marginBottom: "0.75rem" }}>
+                  <div style={{ fontSize: "13px", marginBottom: "4px" }}>
+                    {pid}: {foundWords.length} / {total} words
+                  </div>
+                  <div style={{
+                    width: "100%", height: "20px",
+                    background: "#E5E7EB", borderRadius: "10px", overflow: "hidden"
+                  }}>
+                    <div style={{
+                      width: `${percentage}%`, height: "100%",
+                      background: "#4F46E5", borderRadius: "10px",
+                      transition: "width 0.3s ease"
+                    }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div style={{
-            width: "100%",
-            height: "20px",
-            background: "#E5E7EB",
-            borderRadius: "10px",
-            overflow: "hidden"
-          }}>
-            <div style={{
-              width: `${percentage}%`,
-              height: "100%",
-              background: "#4F46E5",
-              borderRadius: "10px",
-              transition: "width 0.3s ease"
-            }} />
-          </div>
-          <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "2px" }}>
-            {percentage}%
-          </div>
-        </div>
-      );
-    })}
-  </div>
-)}
+        )}
+
+        {/* Coordinate display for testing */}
         <textarea
           readOnly
           rows={5}
@@ -293,16 +267,30 @@ const SignalRTestScreen = () => {
             .map((c) => `row=${c.row}, col=${c.col}, letter=${c.letter}`)
             .join("\n")}
         />
-         <div style={{ marginTop: "1rem" }}>
-            <h3>Messages:</h3>
-            {messages.map((msg, index) => <p key={index}>{msg}</p>)}
-          </div>
+
+        {/* Messages */}
+        <div style={{ marginTop: "1rem" }}>
+          <h3>Messages:</h3>
+          {messages.map((msg, index) => <p key={index}>{msg}</p>)}
+        </div>
+
+        {/* Word list with strikethrough */}
         <div style={{ marginTop: "1rem" }}>
           <h3>Words to find:</h3>
           <ul>
-            {gameDto.puzzledto.listOfWords.map((word, index) => (
-              <li key={index}>{word}</li>
-            ))}
+            {gameDto.puzzledto.listOfWords.map((word, index) => {
+              const myFoundWords = wordsPerPlayer[playerId] ?? [];
+              const isFound = myFoundWords.includes(word);
+
+              return (
+                <li key={index} style={{
+                  textDecoration: isFound ? "line-through" : "none",
+                  color: isFound ? "#9CA3AF" : "black"
+                }}>
+                  {word}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>

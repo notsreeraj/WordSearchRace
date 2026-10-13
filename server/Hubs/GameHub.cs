@@ -78,8 +78,14 @@ namespace server.Hubs
                 await Clients.Caller.SendAsync("ValidSelection","Your selection is valid");
                 // send the the player progress dictionary to the caller or the group
 
-                var playersProgress =  _gameService.UpdatePlayerProgress(submitWordDto.PlayerId,submitWordDto.gameId);
-                await Clients.Group(submitWordDto.gameId).SendAsync( "UpdatedPlayersProgress" ,playersProgress);
+                // var playersProgress =  _gameService.UpdatePlayerProgress(submitWordDto.PlayerId,submitWordDto.gameId);
+                // await Clients.Group(submitWordDto.gameId).SendAsync( "UpdatedPlayersProgress" ,playersProgress);
+
+                // upcoming changes
+                // instead of sending the playerProgress dictionary , send the words perplayer dicitonary when the result is true
+                var wordsPerPlayer = _gameService.GetWordsPlayer(submitWordDto.gameId);
+                await Clients.Group(submitWordDto.gameId).SendAsync("NewFoundWords",wordsPerPlayer);
+
 
                 // if a playerhas won lets broadcast the message
                 if (_gameService.HasPlayerWon(submitWordDto.PlayerId, submitWordDto.gameId))
