@@ -96,7 +96,7 @@ namespace server.Services
             
             // use the currentGame and add the new player to the playeslist
             currentGame.Players.Add(newPlayerID);
-            currentGame.PlayersProgress.Add(newPlayerID,0);
+        //currentGame.PlayersProgress.Add(newPlayerID,0);
             currentGame.WordsPerPlayer.Add(newPlayerID, new List<string>());
 
             // update the game with new property
@@ -179,23 +179,23 @@ namespace server.Services
 
 
         // method to update a player progress
-        public Dictionary<string,int> UpdatePlayerProgress( string playerID, string gameId)
-        {
-            // get the game reference
-            var game = FindGameID(gameId);
-            if(game == null) throw new Exception("Game Not Found");
+        // public Dictionary<string,int> UpdatePlayerProgress( string playerID, string gameId)
+        // {
+        //     // get the game reference
+        //     var game = FindGameID(gameId);
+        //     if(game == null) throw new Exception("Game Not Found");
 
 
-            // update the value in dictionary by key
-            game.PlayersProgress[playerID] ++;
-            _games[gameId]= game;
+        //     // update the value in dictionary by key
+        //     game.PlayersProgress[playerID] ++;
+        //     _games[gameId]= game;
 
 
-            //alright let us also add the found word to the wordperplayer list
-           // game.WordsPerPlayer[playerID].Add()
-            return game.PlayersProgress;
-            // and also update the game
-        }
+        //     //alright let us also add the found word to the wordperplayer list
+        //    // game.WordsPerPlayer[playerID].Add()
+        //     return game.PlayersProgress;
+        //     // and also update the game
+        // }
 
         /// <summary>
         /// method to see if a player has won by id
@@ -210,7 +210,9 @@ namespace server.Services
             if(game == null) throw new Exception("Game Not Found");
 
             // find the progress of the player and see if the value is same as the count of words
-            var prog = game.PlayersProgress[playerId];
+           // var prog = game.PlayersProgress[playerId];
+
+            var prog = game.WordsPerPlayer[playerId].Count;
             var maxProg = game.Puzzle.ListOfWords.Count;
 
             if(prog == maxProg)

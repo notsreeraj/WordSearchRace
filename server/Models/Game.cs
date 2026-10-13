@@ -21,10 +21,7 @@ namespace server.Models
         public int? PlayersReady {get;set;} = 0;
         public Puzzle? Puzzle { get; set; }
 
-        public Dictionary<string, int>? PlayersProgress { get; set; } = new()
-        {
-            [playerId] = 0   
-        };
+
 
         public Dictionary<string , List<string>>? WordsPerPlayer { get; set; }  = new(){
             // add the first player to the list
