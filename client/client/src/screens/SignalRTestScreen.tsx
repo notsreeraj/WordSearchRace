@@ -31,6 +31,7 @@ const SignalRTestScreen = () => {
   const [isInvalid, setIsInvalid] = useState(false);
   const [playerId, setPlayerID] = useState("");
   const [wordsPerPlayer, setWordsPerPlayer] = useState<Record<string, string[]>>({});
+  const [foundCells, setFoundCells] = useState<Cell[]>([]);
 
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
@@ -76,6 +77,7 @@ const SignalRTestScreen = () => {
 
         newConnection.on("NewFoundWords", (data: Record<string, string[]>) => {
           setWordsPerPlayer(data);
+          setFoundCells((prev) => [...prev, ...selectedCells]);
         });
       })
       .catch((err) => console.error("Connection failed: ", err));
@@ -186,20 +188,23 @@ const SignalRTestScreen = () => {
     }
   };
 
-  const renderGrid = () => {
-    if (!gameDto?.puzzledto?.gridSingleD) return null;
-    const grid = gameDto.puzzledto.gridSingleD;
+const renderGrid = () => {    
+  if (!gameDto?.puzzledto?.gridSingleD) return null;
+  const grid = gameDto.puzzledto.gridSingleD;
 
-    return (
-      <div style={{ userSelect: "none" }}>
-        <table style={{ borderCollapse: "collapse", marginTop: "1rem" }}>
-          <tbody>
-            {grid.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.split("").map((letter, colIndex) => (
+  return (
+    <div style={{ userSelect: "none" }}>
+      <table style={{ borderCollapse: "collapse", marginTop: "1rem" }}>
+        <tbody>
+          {grid.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.split("").map((letter, colIndex) => {
+                const isFound = foundCells.some((c) => c.row === rowIndex && c.col === colIndex);
+                return (
                   <td key={colIndex}>
                     <button
-                      onMouseDown={() => handleMouseDown(letter, rowIndex, colIndex)}
+                      disabled={isFound}
+                      onMouseDown={() => !isFound && handleMouseDown(letter, rowIndex, colIndex)}
                       onMouseEnter={() => handleMouseEnter(letter, rowIndex, colIndex)}
                       onMouseUp={handleMouseUp}
                       style={{
@@ -207,13 +212,17 @@ const SignalRTestScreen = () => {
                         height: "36px",
                         fontSize: "14px",
                         fontWeight: "bold",
-                        cursor: "pointer",
-                        backgroundColor: isInvalid && isSelected(rowIndex, colIndex)
+                        cursor: isFound ? "default" : "pointer",
+                        backgroundColor: isFound
+                          ? "#D1FAE5"
+                          : isInvalid && isSelected(rowIndex, colIndex)
                           ? "#FEE2E2"
                           : isSelected(rowIndex, colIndex)
                           ? "#4F46E5"
                           : "#F3F4F6",
-                        color: isSelected(rowIndex, colIndex)
+                        color: isFound
+                          ? "#065F46"
+                          : isSelected(rowIndex, colIndex)
                           ? isInvalid ? "#991B1B" : "white"
                           : "black",
                         border: "1px solid #D1D5DB",
@@ -223,80 +232,80 @@ const SignalRTestScreen = () => {
                       {letter}
                     </button>
                   </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        {/* Progress Bars */}
-        {Object.keys(wordsPerPlayer).length > 0 && gameDto?.puzzledto && (
-          <div style={{ marginTop: "1rem" }}>
-            <h3>Progress</h3>
-            {Object.entries(wordsPerPlayer).map(([pid, foundWords]) => {
-              const total = gameDto?.puzzledto?.listOfWords.length ?? 1;
-              const percentage = Math.round((foundWords.length / total) * 100);
+      {/* Progress Bars */}
+      {Object.keys(wordsPerPlayer).length > 0 && gameDto?.puzzledto && (
+        <div style={{ marginTop: "1rem" }}>
+          <h3>Progress</h3>
+          {Object.entries(wordsPerPlayer).map(([pid, foundWords]) => {
+            const total = gameDto?.puzzledto?.listOfWords.length ?? 1;
+            const percentage = Math.round((foundWords.length / total) * 100);
 
-              return (
-                <div key={pid} style={{ marginBottom: "0.75rem" }}>
-                  <div style={{ fontSize: "13px", marginBottom: "4px" }}>
-                    {pid}: {foundWords.length} / {total} words
-                  </div>
-                  <div style={{
-                    width: "100%", height: "20px",
-                    background: "#E5E7EB", borderRadius: "10px", overflow: "hidden"
-                  }}>
-                    <div style={{
-                      width: `${percentage}%`, height: "100%",
-                      background: "#4F46E5", borderRadius: "10px",
-                      transition: "width 0.3s ease"
-                    }} />
-                  </div>
+            return (
+              <div key={pid} style={{ marginBottom: "0.75rem" }}>
+                <div style={{ fontSize: "13px", marginBottom: "4px" }}>
+                  {pid}: {foundWords.length} / {total} words
                 </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Coordinate display for testing */}
-        <textarea
-          readOnly
-          rows={5}
-          style={{ width: "100%", fontFamily: "monospace", marginTop: "0.5rem" }}
-          value={selectedCells
-            .map((c) => `row=${c.row}, col=${c.col}, letter=${c.letter}`)
-            .join("\n")}
-        />
-
-        {/* Messages */}
-        <div style={{ marginTop: "1rem" }}>
-          <h3>Messages:</h3>
-          {messages.map((msg, index) => <p key={index}>{msg}</p>)}
-        </div>
-
-        {/* Word list with strikethrough */}
-        <div style={{ marginTop: "1rem" }}>
-          <h3>Words to find:</h3>
-          <ul>
-            {gameDto.puzzledto.listOfWords.map((word, index) => {
-              const myFoundWords = wordsPerPlayer[playerId] ?? [];
-              const isFound = myFoundWords.includes(word);
-
-              return (
-                <li key={index} style={{
-                  textDecoration: isFound ? "line-through" : "none",
-                  color: isFound ? "#9CA3AF" : "black"
+                <div style={{
+                  width: "100%", height: "20px",
+                  background: "#E5E7EB", borderRadius: "10px", overflow: "hidden"
                 }}>
-                  {word}
-                </li>
-              );
-            })}
-          </ul>
+                  <div style={{
+                    width: `${percentage}%`, height: "100%",
+                    background: "#4F46E5", borderRadius: "10px",
+                    transition: "width 0.3s ease"
+                  }} />
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
-    );
-  };
+      )}
 
+      {/* Coordinate display for testing */}
+      <textarea
+        readOnly
+        rows={5}
+        style={{ width: "100%", fontFamily: "monospace", marginTop: "0.5rem" }}
+        value={selectedCells
+          .map((c) => `row=${c.row}, col=${c.col}, letter=${c.letter}`)
+          .join("\n")}
+      />
+
+      {/* Messages */}
+      <div style={{ marginTop: "1rem" }}>
+        <h3>Messages:</h3>
+        {messages.map((msg, index) => <p key={index}>{msg}</p>)}
+      </div>
+
+      {/* Word list with strikethrough */}
+      <div style={{ marginTop: "1rem" }}>
+        <h3>Words to find:</h3>
+        <ul>
+          {gameDto.puzzledto.listOfWords.map((word, index) => {
+            const myFoundWords = wordsPerPlayer[playerId] ?? [];
+            const isFound = myFoundWords.includes(word);
+
+            return (
+              <li key={index} style={{
+                textDecoration: isFound ? "line-through" : "none",
+                color: isFound ? "#9CA3AF" : "black"
+              }}>
+                {word}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+};
   return (
     <div style={{ padding: "1rem" }}>
       <h2>SignalR Hub Test</h2>
